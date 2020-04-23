@@ -2,7 +2,9 @@
 """
 Gimp gimpfu plug-in for board game card creation.
 
-Code not using gimpfu is
+Code not using gimpfu is imported from
+CardAssembler_Definitions.py, which is
+located in data folder.
 """
 
 # ---IMPORTS---
@@ -15,13 +17,15 @@ import sys
 
 # ---FUNCTIONS---
 def data_folder():
-    """ Find Data folder 
+    """ Find Data folder.
 
-    It will be set as default
-    value in GF.register function.
+    It is set as default value
+    in GF.register function.
     """
     dataFolder = os.path.expanduser('~').replace("\\", "/")
-    dataFolder += '/AppData/Roaming/GIMP/'  # 2.10/plug-ins/CardAssembler'
+    # Rest of the Gimp plug-in path contains gimp version
+    # and therefore can change. Any folder can be chosen.
+    dataFolder += '/AppData/Roaming/GIMP/'
     return dataFolder
 
 
@@ -30,14 +34,12 @@ def card_creator(dataFolder, xmlFile, cardIDs):
     from predefined values. Requires two arguments, the paths to
     the card definitions and chosen card ID.
     """
-    # This weird import is forced by Gimp running this script thr.\n Gimp plug-in folder: <user>ugh
-    # eval(...) function inside its installation folder and direc
+    # This weird import is forced by Gimp running this script through
+    # eval(...) function inside its installation folder and direct
     # import from different folder raises 'access denied' error.
+    dataFolder += '/'
     sys.path.append(dataFolder)
     import CardAssembler_Definitions
-
-    # Gimp's "GF.PF_DIRNAME" returns path without trailing slash.
-    dataFolder += '/'
 
     toolbox = Toolbox(dataFolder)
     toolbox.card = CardAssembler_Definitions.Card(dataFolder + xmlFile)
@@ -89,8 +91,11 @@ class Toolbox(object):
             raise Exception('Card must be initialized first!')
 
         # Draw image base on self.card.layout.
-        for layout in self.card.generate_layout(cardID):
-            self.component_type[layout['componentType']](layout)
+        layout = self.card.generate_layout_dict(cardID)
+        keys = sorted(layout.keys())
+        for key in keys:
+            item = layout[key]
+            self.component_type[item['componentType']](item)
 
     def component_layer_background(self, layout):
         """ One-colour-filled-layer. Allows masks.

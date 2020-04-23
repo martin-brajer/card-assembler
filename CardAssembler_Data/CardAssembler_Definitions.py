@@ -17,8 +17,9 @@ def main():
     """ Testing area. """
     card = Card(
         'C:/<path>/CardAssembler/CardAssembler_Data/Blueprint.xml')
-    layout = card.generate_layout("unique item dragonPotion")
-    input('STOPPED')
+    layout = card.generate_layout_dict(
+        "cardID")
+    pass
 
 
 # ---CLASSES---
@@ -83,16 +84,36 @@ class Card(object):
 
         raise KeyError('Method "{}" not found!'.format(method))
 
-    def generate_layout(self, startBy):
+    def generate_layout_dict(self, startBy):
         """ Generate layout given starting position.
 
         Starting position keys are sorted alphabetically
         (name them accordingly).
         """
-        layout = []
-        keys = sorted(self.nextDataset(startBy).keys())
-        for key in keys:
-            layout.append(self.stepIn({}, startBy + ' ' + key))
+        return self.stepIn({}, startBy)
+
+    def stepIn(self, layout, thisStep):
+        """ Browse data guided by 'next' key
+        and fill missing values. """
+        nextSteps = []
+        for key, value in self.nextDataset(thisStep).items():
+            # Next is not written into layout.
+            if key == 'next':
+                nextSteps = value.split(', ')
+
+            # If lower levels can be reached.
+            elif isinstance(value, dict):
+                if key not in layout:
+                    layout[key] = {}
+                self.stepIn(layout[key], thisStep + ' ' + key)
+
+            # Keys having values from higher levels are NOT changed.
+            elif key not in layout:
+                layout[key] = value
+
+        # Recursively browse all branches.
+        while nextSteps:
+            self.stepIn(layout, nextSteps.pop())
 
         return layout
 
@@ -102,32 +123,11 @@ class Card(object):
         Individual node turns must be separated by space.
         """
         data = self.data
-        if not isinstance(nextSteps, list):
-            nextSteps = nextSteps.split(' ')
-
         # Down the rabbit hole!
-        for nextStep in nextSteps:
+        for nextStep in nextSteps.split(' '):
             data = data[nextStep]
 
         return data
-
-    def stepIn(self, item, thisStep):
-        """ Browse layout guided by 'next' key
-        and fill missing values. """
-        nextSteps = []
-        for key, value in self.nextDataset(thisStep).items():
-            # Next is not written into layout.
-            if key == 'next':
-                nextSteps = value.split(', ')
-            # Keys having values from higher levels are NOT changed.
-            elif key not in item:
-                item[key] = value
-
-        # Recursively browse all branches.
-        while nextSteps:
-            item = self.stepIn(item, nextSteps.pop())
-
-        return item
 
     # def generate_palette(self, name):
     #     """ Make palette out of used colors. Then import it into Gimp. """
