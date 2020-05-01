@@ -17,10 +17,8 @@ def main():
     """ Testing area. """
     import os.path
 
-    blueprint = Blueprint(os.path.dirname(
-        __file__) + '/Blueprint_Example2.xml')
-    layout = blueprint.generate_layout_dict("unique spell example")
-    # layout = blueprint.generate_layout_dict("unique item itemExample")
+    blueprint = Blueprint(os.path.dirname(__file__) + '/Blueprint.xml')
+    layout = blueprint.generate_layout_dict("unique item example")
     pass
 
 

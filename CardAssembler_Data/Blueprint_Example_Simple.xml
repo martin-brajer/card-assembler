@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE data>
+<!-- spell-checker: disable -->
+
+<data>
+    <example>
+        <layer01_image>
+            <componentType>image</componentType>
+            <size parse="tuple">800, 500</size>
+        </layer01_image>
+        <layer02_background>
+            <componentType>monochrome</componentType>
+            <name>Background</name>
+            <color>#ffffff</color>
+            <size parse="tuple">800, 500</size>
+        </layer02_background>
+        <layer03_text>
+            <componentType>text</componentType>
+            <name>Text</name>
+            <text>Example 1</text>
+            <font>Tahoma Bold</font>
+            <fontSize parse="int">44</fontSize>
+            <justification parse="int">2</justification>
+            <position parse="tuple">100, 125</position>
+            <size parse="tuple">600, 60</size>
+        </layer03_text>
+    </example>
+</data>
