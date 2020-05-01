@@ -10,9 +10,9 @@ Card Assembler is a free and open-source plug-in for Gimp. Assembles an image ac
 
 ## Installation
 
-Copy `CardAssembler.py` file into your Gimp plug-in folder: `<user>/AppData/Roaming/GIMP/<version>/plug-ins/`. Then you can find the plug-in in Gimp menu bar as `Card Assembler`.
+Copy `card-assembler.py` file into your Gimp plug-in folder: `<user>/AppData/Roaming/GIMP/<version>/plug-ins/`. Then you can find the plug-in in Gimp menu bar as `Card Assembler`.
 
-Data folder `CardAssembler_Data` can be renamed and located anywhere. When you run the plug-in, Gimp will ask you for its location. In this folder, the main script will look for the suplemental script (CardAssembler_Definitions.py) and blueprints (*.xml).
+Data folder `cardassembler_data` can be renamed and located anywhere. When you run the plug-in, Gimp will ask you for its location. In this folder, the main script will look for the supplemental script `cardassembler_definitions.py` and blueprints `*.xml`.
 
 
 
