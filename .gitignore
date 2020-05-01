@@ -1,6 +1,10 @@
 # My files.
+.vscode/
 Data_image_item.xcf
 Blueprint.xml
+TODO.txt
+Blueprint_Example1.xml
+Blueprint_Example2.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

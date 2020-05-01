@@ -7,7 +7,6 @@ return layout list, which is used by the main script.
 """
 # ---IMPORTS---
 import xml.etree.ElementTree as ET
-import os.path
 
 # ---CONSTANTS---
 
@@ -16,15 +15,19 @@ import os.path
 
 def main():
     """ Testing area. """
-    card = Card(os.path.dirname(__file__) + '/Blueprint.xml')
-    layout = card.generate_layout_dict("unique item itemExample")
+    import os.path
+
+    blueprint = Blueprint(os.path.dirname(
+        __file__) + '/Blueprint_Example2.xml')
+    layout = blueprint.generate_layout_dict("unique spell example")
+    # layout = blueprint.generate_layout_dict("unique item itemExample")
     pass
 
 
 # ---CLASSES---
 
 
-class Card(object):
+class Blueprint(object):
     """ Card information handling class.
 
     Can read xml file and return layout list,
@@ -32,9 +35,9 @@ class Card(object):
     """
 
     def __init__(self, filePath):
-        self.data = self.load_data(filePath)
+        self.data = self._load_data(filePath)
 
-    def load_data(self, filePath):
+    def _load_data(self, filePath):
         """ Load filepath -> xml file into dictionary tree. """
         root = ET.parse(filePath).getroot()
         return self.xml2dict(root)
@@ -76,10 +79,10 @@ class Card(object):
             return float(text)
 
         elif method == 'tuple':
-            newText = []
+            new = []
             for txt in text.split(', '):
-                newText.append(self._parse(txt, 'int'))
-            return tuple(newText)
+                new.append(self._parse(txt, 'int'))
+            return tuple(new)
 
         raise KeyError('Method "{}" not found!'.format(method))
 
@@ -89,13 +92,13 @@ class Card(object):
         Starting position keys are sorted alphabetically
         (name them accordingly).
         """
-        return self.stepIn({}, startBy)
+        return self._stepIn({}, startBy)
 
-    def stepIn(self, layout, thisStep):
+    def _stepIn(self, layout, thisStep):
         """ Browse data guided by 'next' key
         and fill missing values. """
         nextSteps = []
-        for key, value in self.nextDataset(thisStep).items():
+        for key, value in self._nextDataset(thisStep).items():
             # Next is not written into layout.
             if key == 'next':
                 nextSteps = value.split(', ')
@@ -104,7 +107,7 @@ class Card(object):
             elif isinstance(value, dict):
                 if key not in layout:
                     layout[key] = {}
-                self.stepIn(layout[key], thisStep + ' ' + key)
+                self._stepIn(layout[key], thisStep + ' ' + key)
 
             # Keys having values from higher levels are NOT changed.
             elif key not in layout:
@@ -112,11 +115,11 @@ class Card(object):
 
         # Recursively browse all branches.
         while nextSteps:
-            self.stepIn(layout, nextSteps.pop())
+            self._stepIn(layout, nextSteps.pop())
 
         return layout
 
-    def nextDataset(self, nextSteps):
+    def _nextDataset(self, nextSteps):
         """ Browse ElementTree based on argument indicator.
 
         Individual node turns must be separated by space.

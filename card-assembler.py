@@ -42,12 +42,13 @@ def card_creator(dataFolder, xmlFile, cardIDs):
     import cardassembler_definitions
 
     toolbox = Toolbox(dataFolder)
-    toolbox.card = cardassembler_definitions.Card(dataFolder + xmlFile)
+    toolbox.blueprint = cardassembler_definitions.Blueprint(
+        dataFolder + xmlFile)
 
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
 
-    for cardID in cardIDs.split(', '):
+    for cardID in cardIDs.split('\n'):
         toolbox.create_image(cardID)
         toolbox.display_image()
 
@@ -68,7 +69,7 @@ class Toolbox(object):
 
         Parameter is a location of the xml file.
         """
-        self.card = None
+        self.blueprint = None
         self.dataFolder = dataFolder
         # Code output will be here.
         self.image = None
@@ -77,42 +78,55 @@ class Toolbox(object):
 
         # Image components this script can handle.
         self.component_type = {
-            'background': self.component_layer_background,
-            'data_image': self.component_copy_from_data_image,
-            'data_image_load': self.component_load_data_image,
-            'group': self.component_layer_group,
-            'image': self.component_initialize_image,
-            'text': self.component_text_layer,
+            'image': self._component_image,
+            'monochrome': self._component_monochrome,
+            'import_layer_load': self._component_import_layer_load,
+            'import_layer': self._component_import_layer,
+            'group': self._component_group,
+            'text': self._component_text,
         }
 
     def create_image(self, cardID):
-        """ Card.layout information si utilized here. """
-        if self.card is None:
-            raise Exception('Card must be initialized first!')
+        """ Blueprint > layout information si utilized here. """
+        if self.blueprint is None:
+            raise Exception('Blueprint must be initialized first!')
 
-        # Draw image base on self.card.layout.
-        layout = self.card.generate_layout_dict(cardID)
+        # Draw image base on layout based on self.blueprintTree.
+        layout = self.blueprint.generate_layout_dict(cardID)
         keys = sorted(layout.keys())
         for key in keys:
-            item = layout[key]
-            self.component_type[item['componentType']](item)
+            itemLayout = layout[key]
+            self.component_type[itemLayout['componentType']](itemLayout)
 
-    def component_layer_background(self, layout):
+    def _component_image(self, layout):
+        """ Create new image. This is the first call in a layout sequence.
+
+        Parameters: size(tuple), [name(string)].
+        """
+        self.image = GF.pdb.gimp_image_new(
+            layout['size'][0], layout['size'][1], GF.RGB)
+        GF.pdb.gimp_image_set_filename(
+            self.image, layout.get('name', 'Card Assembler Image'))
+
+    def _component_monochrome(self, layout):
         """ One-colour-filled-layer. Allows masks.
 
         Parameters: size(tuple), color(string),
-            [name(string)], [addToPosition(int)].
+            [name(string)], [position(tuple)],
+            [addToPosition(int)].
         """
         layer = GF.pdb.gimp_layer_new(self.image,
                                       layout['size'][0], layout['size'][1],
                                       GF.RGB, layout.get(
-                                          'name', 'Background'),
+                                          'name', 'Monochrome'),
                                       100, GF.LAYER_MODE_NORMAL)
         self.image.add_layer(layer, layout.get('addToPosition', 0))
+        if 'position' in layout:
+            GF.pdb.gimp_layer_set_offsets(layer, *layout['position'])
         GF.pdb.gimp_context_set_foreground(layout['color'])
         GF.pdb.gimp_drawable_edit_bucket_fill(layer, 0, 0, 0)
 
-    def component_load_data_image(self, layout):
+    def _component_import_layer_load(self, layout):
         """ Load new data image.
 
         Must be in Data folder. Filename is specified in xml file.
@@ -124,7 +138,7 @@ class Toolbox(object):
         self.data_images[layout['name']] = GF.pdb.gimp_file_load(
             filepath, filepath)
 
-    def component_copy_from_data_image(self, layout):
+    def _component_import_layer(self, layout):
         """ Copy layer from a data image.
 
         Parameters: targetFile(string), targetLayer(string),
@@ -135,11 +149,11 @@ class Toolbox(object):
         newLayer = GF.pdb.gimp_layer_new_from_drawable(
             oldLayer, self.image)
         self.image.add_layer(newLayer, layout.get('addToPosition', 0))
-        newLayer.name = layout.get('name', newLayer.name[:-5])
+        newLayer.name = layout.get('name', layout['targetLayer'])
         GF.pdb.gimp_layer_set_offsets(
             newLayer, *layout.get('position', (0, 0)))
 
-    def component_layer_group(self, layout):
+    def _component_group(self, layout):
         """ Create new layer group.
 
         To fill next layers in, their 'addToPosition'
@@ -150,23 +164,13 @@ class Toolbox(object):
         self.image.add_layer(layerGroup, layout.get('addToPosition', 0))
         layerGroup.name = layout.get('name', 'Group')
 
-    def component_initialize_image(self, layout):
-        """ Create new image. This is the first call in a layout sequence.
-
-        Parameters: size(tuple), [name(string)].
-        """
-        self.image = GF.pdb.gimp_image_new(
-            layout['size'][0], layout['size'][1], GF.RGB)
-        GF.pdb.gimp_image_set_filename(
-            self.image, layout.get('name', 'Image'))
-
-    def component_text_layer(self, layout):
+    def _component_text(self, layout):
         """ Text layer.
 
         If Size is not filled in, 'dynamic' mode is used.
         Justification values: left(0), right(1), center(2), fill(3).
         Parameters: text(string), font(string), fontSize(int),
-            textScale(float), [addToPosition(int)], [name(string)],
+            [textScale(float)], [addToPosition(int)], [name(string)],
             [color(string)], [size(tuple)], [lineSpacing(float)],
             [letterSpacing(float)], [justification(int)], [position(tuple)].
         """
