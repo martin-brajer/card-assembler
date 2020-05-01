@@ -39,10 +39,10 @@ def card_creator(dataFolder, xmlFile, cardIDs):
     # import from different folder raises 'access denied' error.
     dataFolder += '/'
     sys.path.append(dataFolder)
-    import CardAssembler_Definitions
+    import cardassembler_definitions
 
     toolbox = Toolbox(dataFolder)
-    toolbox.card = CardAssembler_Definitions.Card(dataFolder + xmlFile)
+    toolbox.card = cardassembler_definitions.Card(dataFolder + xmlFile)
 
     if not cardIDs:
         raise ValueError('No card IDs inserted!')

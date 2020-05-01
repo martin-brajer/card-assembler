@@ -7,6 +7,7 @@ return layout list, which is used by the main script.
 """
 # ---IMPORTS---
 import xml.etree.ElementTree as ET
+import os.path
 
 # ---CONSTANTS---
 
@@ -15,10 +16,8 @@ import xml.etree.ElementTree as ET
 
 def main():
     """ Testing area. """
-    card = Card(
-        'C:/<path>/CardAssembler/CardAssembler_Data/Blueprint.xml')
-    layout = card.generate_layout_dict(
-        "cardID")
+    card = Card(os.path.dirname(__file__) + '/Blueprint.xml')
+    layout = card.generate_layout_dict("unique item itemExample")
     pass
 
 
