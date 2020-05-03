@@ -1,5 +1,4 @@
 {
-    "files.autoSave": "afterDelay",
     "rainbowTags.colors": [
         "#ff0000",
         "#ffa500",
@@ -11,5 +10,6 @@
     ],
     "cSpell.words": [
         "cardassembler"
-    ]
+    ],
+    "python.pythonPath": "C:\\Program Files\\GIMP 2\\bin\\python.exe"
 }

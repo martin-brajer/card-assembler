@@ -2,6 +2,8 @@
 <!DOCTYPE data>
 <!-- spell-checker: disable -->
 
+<!-- CardID: "example". -->
+
 <data>
     <example>
         <layer01_image>
@@ -9,7 +11,7 @@
             <size parse="tuple">800, 500</size>
         </layer01_image>
         <layer02_background>
-            <componentType>monochrome</componentType>
+            <componentType>Monochrome</componentType>
             <name>Background</name>
             <color>#ffffff</color>
             <size parse="tuple">800, 500</size>

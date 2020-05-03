@@ -2,9 +2,9 @@
 """
 Gimp gimpfu plug-in for board game card creation.
 
-Code not using gimpfu is imported from
-CardAssembler_Definitions.py, which is
-located in data folder.
+Code not using gimpfu is imported from CardAssembler_Definitions.py,
+which is located in data folder.
+Written for Gimp 2.10.18, which uses python 2.7.17.
 """
 
 # ---IMPORTS---
@@ -22,14 +22,14 @@ def data_folder():
     It is set as default value
     in GF.register function.
     """
-    dataFolder = os.path.expanduser('~').replace("\\", "/")
+    dataFolder = os.path.expanduser('~')  # .replace("\\", "/")
     # Rest of the Gimp plug-in path contains gimp version
     # and therefore can change. Any folder can be chosen.
     dataFolder += '/AppData/Roaming/GIMP/'
     return dataFolder
 
 
-def card_creator(dataFolder, xmlFile, cardIDs):
+def card_creator(dataFolder, xmlFile, cardIDs, save):
     """Registered function CardCreator, creates new card image
     from predefined values. Requires two arguments, the paths to
     the card definitions and chosen card ID.
@@ -39,7 +39,10 @@ def card_creator(dataFolder, xmlFile, cardIDs):
     # import from different folder raises 'access denied' error.
     dataFolder += '/'
     sys.path.append(dataFolder)
-    import cardassembler_definitions
+    try:
+        import cardassembler_definitions
+    except ImportError, err:
+        raise ImportError('{} in folder {}'.format(str(err), dataFolder))
 
     toolbox = Toolbox(dataFolder)
     toolbox.blueprint = cardassembler_definitions.Blueprint(
@@ -51,30 +54,32 @@ def card_creator(dataFolder, xmlFile, cardIDs):
     for cardID in cardIDs.split('\n'):
         toolbox.create_image(cardID)
         toolbox.display_image()
+        if save:
+            toolbox.save_image()
 
 
 # ---CLASSES---
 class Toolbox(object):
-    """ Card data to image manipulation tool.
+    """ Blueprint to image manipulation tool.
 
-    Image build information is saved in a xml file.
+    Image build information is saved in an xml file.
 
-    This class offers UI for common card components (i.e. text, icons).
-    Then completes the image and optionally save it. Probably
-    you want to fine-tune it manually.
+    This class offers means for creating common card components
+    (i.e. text, icons). Then completes the image and optionally
+    saves it. Probably you'll want to fine-tune it manually.
     """
 
     def __init__(self, dataFolder):
         """ Init.
 
-        Parameter is a location of the xml file.
+        Parameter 'dataFolder' is a location of the xml files.
         """
         self.blueprint = None
         self.dataFolder = dataFolder
-        # Code output will be here.
-        self.image = None
-        # Gimp image objects to be used to import predefined layers.
-        self.data_images = {}
+
+        # Gimp image objects
+        self.image = None  # Code output will be here.
+        self.data_images = {}  # {name: Gimp image object}
 
         # Image components this script can handle.
         self.component_type = {
@@ -91,12 +96,20 @@ class Toolbox(object):
         if self.blueprint is None:
             raise Exception('Blueprint must be initialized first!')
 
-        # Draw image base on layout based on self.blueprintTree.
         layout = self.blueprint.generate_layout_dict(cardID)
-        keys = sorted(layout.keys())
-        for key in keys:
-            itemLayout = layout[key]
-            self.component_type[itemLayout['componentType']](itemLayout)
+        for layerName in sorted(layout.keys()):
+            layerLayout = layout[layerName]
+            if 'componentType' in layerLayout:
+                componentType = layerLayout['componentType']
+                if componentType in self.component_type:
+                    self.component_type[componentType](layerLayout)
+                else:
+                    raise KeyError(
+                        'Unknown componentType "{}" of layer "{}"'.format(
+                            componentType, layerName))
+            else:
+                raise KeyError(
+                    'Layer "{}" is missing componentType tag.'.format(layerName))
 
     def _component_image(self, layout):
         """ Create new image. This is the first call in a layout sequence.
@@ -198,13 +211,13 @@ class Toolbox(object):
         """ Display the created image. """
         display = GF.pdb.gimp_display_new(self.image)
 
-    # def save_image(self):
-    #     tgtFile = DATAPATH  # Path.
-    #     GF.pdb.gimp_xcf_save(0, self.image, None, tgtFile, tgtFile)
-
-    # def delete_image(self):
-    #     GF.pdb.gimp_image_delete(self.image)
-    #     gimp_display_delete
+    def save_image(self):
+        """ X """
+        directory = self.dataFolder + 'Saved images/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        filename = directory + GF.pdb.gimp_image_get_name(self.image) + '.xcf'
+        GF.pdb.gimp_xcf_save(0, self.image, None, filename, filename)
 
 
 # ---REGISTER---
@@ -222,7 +235,7 @@ GF.register(
         (GF.PF_DIRNAME, "dataFolder", "Data folder:", data_folder()),
         (GF.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
         (GF.PF_TEXT, "cardIDs", "Card IDs:", ""),
-        # (GF.PF_BOOL, "saveclose", "Save & close:", False),
+        (GF.PF_BOOL, "save", "Save:", False),
     ],
     [],  # (results).
     card_creator,  # Matches to name of function being defined (function).

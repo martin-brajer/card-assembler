@@ -99,7 +99,8 @@ class Blueprint(object):
         for key, value in self._nextDataset(thisStep).items():
             # Next is not written into layout.
             if key == 'next':
-                nextSteps = value.split(', ')
+                for nextStep in value.split(', '):
+                    nextSteps.append(nextStep)
 
             # If lower levels can be reached.
             elif isinstance(value, dict):
@@ -111,7 +112,7 @@ class Blueprint(object):
             elif key not in layout:
                 layout[key] = value
 
-        # Recursively browse all branches.
+        # Recursively browse all "next"-branches.
         while nextSteps:
             self._stepIn(layout, nextSteps.pop())
 
@@ -125,17 +126,25 @@ class Blueprint(object):
         data = self.data
         # Down the rabbit hole!
         for nextStep in nextSteps.split(' '):
-            data = data[nextStep]
+            if nextStep in data:
+                data = data[nextStep]
+            else:
+                raise KeyError(
+                    'While browsing the data tree by "{}", keyword "{}" was not found.'.format(
+                        nextSteps, nextStep))
 
         return data
 
     # def generate_palette(self, name):
-    #     """ Make palette out of used colors. Then import it into Gimp. """
+    #     """ Make palette out of used colors. Then import it into Gimp.
+
+    #     To be used in another mini plug-in.
+    #     """
     #     palette = []
     #     for item in self.data['color']:
     #         pass
 
-    #     return
+    #     return palette
 
 
 # ---MAIN---
