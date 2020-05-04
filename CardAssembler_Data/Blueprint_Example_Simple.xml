@@ -6,18 +6,18 @@
 
 <data>
     <example>
-        <layer01_image>
-            <componentType>image</componentType>
+        <command01_image>
+            <commandType>image</commandType>
             <size parse="tuple">800, 500</size>
-        </layer01_image>
-        <layer02_background>
-            <componentType>Monochrome</componentType>
+        </command01_image>
+        <command02_background>
+            <commandType>monochrome</commandType>
             <name>Background</name>
             <color>#ffffff</color>
             <size parse="tuple">800, 500</size>
-        </layer02_background>
-        <layer03_text>
-            <componentType>text</componentType>
+        </command02_background>
+        <command03_text>
+            <commandType>text</commandType>
             <name>Text</name>
             <text>Example 1</text>
             <font>Tahoma Bold</font>
@@ -25,6 +25,6 @@
             <justification parse="int">2</justification>
             <position parse="tuple">100, 125</position>
             <size parse="tuple">600, 60</size>
-        </layer03_text>
+        </command03_text>
     </example>
 </data>

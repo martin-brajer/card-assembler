@@ -9,31 +9,31 @@
         <spell>
             <example>
                 <next>template spell layout</next>
-                <layer01_image>
+                <command01_image>
                     <name>Fluff</name>
-                </layer01_image>
-                <layer02_background>
+                </command01_image>
+                <command02_background>
                     <next>color spell fast</next>
-                </layer02_background>
-                <layer04_name>
+                </command02_background>
+                <command04_name>
                     <text>Fluff</text>
-                </layer04_name>
-                <layer05_text>
+                </command04_name>
+                <command05_text>
                     <text>Pay one mana.\nTo the end of the turn, increase cuteness by one of two selected kittens.</text>
-                </layer05_text>
-                <layer08_symbol1>
+                </command05_text>
+                <command08_symbol1>
                     <next>template spell symbol kitty</next>
                     <next>template spell symbol position p1</next>
-                </layer08_symbol1>
-                <layer09_symbol2>
+                </command08_symbol1>
+                <command09_symbol2>
                     <next>template spell symbol kitty</next>
                     <next>template spell symbol position p2</next>
-                </layer09_symbol2>
-                <layer10_symbol3>
+                </command09_symbol2>
+                <command10_symbol3>
                     <next>template spell symbol text</next>
                     <next>template spell symbol position p3</next>
                     <text>+1</text>
-                </layer10_symbol3>
+                </command10_symbol3>
             </example>
             <anotherSpell></anotherSpell>
         </spell>
@@ -54,30 +54,30 @@
         </textSize>
         <spell>
             <layout>
-                <layer00_loadDataImage>
-                    <componentType>import_layer_load</componentType>
+                <command00_loadDataImage>
+                    <commandType>import_layer_load</commandType>
                     <filename>Data_image_Example.xcf</filename>
                     <name>dataImage1</name>
-                </layer00_loadDataImage>
-                <layer01_image>
+                </command00_loadDataImage>
+                <command01_image>
                     <next>template spell size</next>
-                    <componentType>image</componentType>
-                </layer01_image>
-                <layer02_background>
+                    <commandType>image</commandType>
+                </command01_image>
+                <command02_background>
                     <next>template spell size</next>
-                    <componentType>monochrome</componentType>
+                    <commandType>monochrome</commandType>
                     <name>Background</name>
-                </layer02_background>
-                <layer03_loadFrame>
-                    <componentType>import_layer</componentType>
+                </command02_background>
+                <command03_loadFrame>
+                    <commandType>import_layer</commandType>
                     <targetFile>dataImage1</targetFile>
                     <targetLayer>Corner</targetLayer>
-                </layer03_loadFrame>
-                <layer04_name>
+                </command03_loadFrame>
+                <command04_name>
                     <next>color black</next>
                     <next>template textSize</next>
                     <next>template textScale goldenRatio</next>
-                    <componentType>text</componentType>
+                    <commandType>text</commandType>
                     <name>Name</name>
                     <font>Tahoma Bold</font>
                     <size parse="tuple">400, 100</size>
@@ -85,11 +85,11 @@
                     <letterSpacing parse="float">0.8</letterSpacing>
                     <justification parse="int">2</justification>
                     <position parse="tuple">36, 60</position>
-                </layer04_name>
-                <layer05_text>
+                </command04_name>
+                <command05_text>
                     <next>template textSize</next>
                     <next>color black</next>
-                    <componentType>text</componentType>
+                    <commandType>text</commandType>
                     <name>Text</name>
                     <font>Cambria</font>
                     <fontSize parse="int">20</fontSize>
@@ -97,25 +97,25 @@
                     <lineSpacing parse="float">8.5</lineSpacing>
                     <letterSpacing parse="float">-1.4</letterSpacing>
                     <position parse="tuple">100, 200</position>
-                </layer05_text>
-                <layer06_stripe>
+                </command05_text>
+                <command06_stripe>
                     <next>color white</next>
-                    <componentType>monochrome</componentType>
+                    <commandType>monochrome</commandType>
                     <name>Stripe</name>
                     <position parse="tuple">50, 00</position>
                     <size parse="tuple">25, 250</size>
-                </layer06_stripe>
-                <layer07_symbolsGroup>
-                    <componentType>group</componentType>
+                </command06_stripe>
+                <command07_symbolsGroup>
+                    <commandType>group</commandType>
                     <name>Symbols</name>
-                </layer07_symbolsGroup>
+                </command07_symbolsGroup>
             </layout>
             <size>
                 <size parse="tuple">450, 450</size>
             </size>
             <symbol>
                 <kitty>
-                    <componentType>import_layer</componentType>
+                    <commandType>import_layer</commandType>
                     <targetFile>dataImage1</targetFile>
                     <addToPosition parse="int">-1</addToPosition>
                     <targetLayer>Kitty</targetLayer>
@@ -124,7 +124,7 @@
                     <next>color white</next>
                     <next>template textSize</next>
                     <next>template textScale goldenRatio</next>
-                    <componentType>text</componentType>
+                    <commandType>text</commandType>
                     <addToPosition parse="int">-1</addToPosition>
                     <font>Arial</font>
                     <size parse="tuple">100, 97</size>
