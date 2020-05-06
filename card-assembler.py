@@ -17,7 +17,7 @@ import sys
 
 # ---FUNCTIONS---
 def default_data_folder():
-    """ Gimp in user folder. """
+    """ Gimp's folder in user folder. """
     dataFolder = os.path.expanduser('~')
     # Rest of the Gimp plug-in path contains gimp version
     # and therefore can change. Any folder can be chosen.
@@ -26,17 +26,11 @@ def default_data_folder():
 
 
 def card_creator(dataFolder, xmlFile, cardIDs, save):
-    """ Registered function by GF.register. I.e. Main(). """
-    # This weird import is forced by Gimp running this script through
-    # eval(...) function inside its installation folder and direct
-    # import from different folder raises 'access denied' error.
-    sys.path.append(dataFolder)
-    import cardassembler_definitions
+    """ Creates board-game cards.
 
-    toolbox = Toolbox(dataFolder)
-    toolbox.load_blueprint(
-        xmlFile,
-        blueprintClass=cardassembler_definitions.Blueprint)
+    Registered function by GF.register. Main functionality.
+    """
+    toolbox = initialize_toolbox(dataFolder, xmlFile)
 
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
@@ -48,7 +42,38 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
             toolbox.save_image()
 
 
+def palette_creator(dataFolder, xmlFile, paletteID, name):
+    """ Creates palette.
+
+    Registered function by GF.register. Supplemental functionality.
+    """
+    toolbox = initialize_toolbox(dataFolder, xmlFile)
+
+    if not paletteID:
+        raise ValueError('No palette ID inserted!')
+
+    toolbox.create_palette(paletteID, name)
+
+
+def initialize_toolbox(dataFolder, xmlFile):
+    """ Common initialization used by all registered functions. """
+    # This weird import is forced by Gimp running this script through
+    # eval(...) function inside its installation folder and direct
+    # import from different folder raises 'access denied' error.
+    sys.path.append(dataFolder)
+    import cardassembler_definitions
+
+    toolbox = Toolbox(dataFolder)
+    toolbox.load_blueprint(
+        xmlFile,
+        blueprintClass=cardassembler_definitions.Blueprint)
+
+    return toolbox
+
+
 # ---CLASSES---
+
+
 class Toolbox(object):
     """ Blueprint-to-image manipulation tool.
 
@@ -231,8 +256,41 @@ class Toolbox(object):
         filename = directory + GF.pdb.gimp_image_get_name(self.image) + '.xcf'
         GF.pdb.gimp_xcf_save(0, self.image, None, filename, filename)
 
+    def create_palette(self, paletteID, name):
+        """Blueprint to palette.
+
+        Colors are sorted by their branch hight and then alphabetically.
+        """
+        palette = GF.pdb.gimp_palette_new(name)
+        GF.pdb.gimp_palette_set_columns(palette, 1)
+
+        for name, color in self.blueprint.generate_palette(paletteID):
+            GF.pdb.gimp_palette_add_entry(palette, name, color)
+
 
 # ---REGISTER---
+
+GF.register(
+    "MB_palette_assembler",  # Name registered in Procedure Browser (blurb).
+    # Widget title (proc_name).
+    "Creates palette.\n\nGimp plug-in folder:\n<user>/AppData/Roaming/GIMP/<version>/plug-ins/",
+    "Creates palette",  # Help.
+    "Martin Brajer",  # Author.
+    "Martin Brajer",  # Copyright holder.
+    "May 2020",  # Date.
+    "Palette Assembler",  # Menu Entry (label).
+    "",  # Image Type - no image required (imagetypes).
+    [  # (params).
+        (GF.PF_DIRNAME, "dataFolder", "Data folder:", default_data_folder()),
+        (GF.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
+        (GF.PF_TEXT, "paletteID", "Palette ID:", "color"),
+        (GF.PF_TEXT, "name", "Name:", "Card Assembler Palette"),
+    ],
+    [],  # (results).
+    palette_creator,  # Matches to name of function being defined (function).
+    menu="<Image>/Card Assembler"  # Menu item location.
+)
+
 GF.register(
     "MB_card_assembler",  # Name registered in Procedure Browser (blurb).
     # Widget title (proc_name).
@@ -252,6 +310,6 @@ GF.register(
     [],  # (results).
     card_creator,  # Matches to name of function being defined (function).
     menu="<Image>/Card Assembler"  # Menu item location.
-)   # End register.
+)
 
 GF.main()

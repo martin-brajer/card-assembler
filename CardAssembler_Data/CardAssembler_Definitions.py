@@ -7,6 +7,7 @@ produce layout list, which is used by the main script.
 """
 # ---IMPORTS---
 import xml.etree.ElementTree as ET
+import operator
 
 # ---CONSTANTS---
 
@@ -15,10 +16,9 @@ import xml.etree.ElementTree as ET
 
 def main():
     """ Testing area. """
-    import os.path
-
     blueprint = Blueprint(os.path.dirname(__file__) + '/Blueprint.xml')
     layout = blueprint.generate_layout_dict("unique item example")
+    palette = blueprint.generate_palette("color")
     pass
 
 
@@ -136,18 +136,34 @@ class Blueprint(object):
 
         return data
 
-    # def generate_palette(self, name):
-    #     """ Make palette out of used colors. Then import it into Gimp.
+    def generate_palette(self, startBy):
+        """ Make palette out of used colors.
 
-    #     To be used in another mini plug-in.
-    #     """
-    #     palette = []
-    #     for item in self.data['color']:
-    #         pass
+        To be used in another mini plug-in to import palette into Gimp.
+        """
+        palette = self._harvest_leaves(self._nextDataset(startBy))
+        palette.sort()
+        palette.sort(key=lambda x: x[0].count(' '))
+        return palette
 
-    #     return palette
+    def _harvest_leaves(self, colorDict):
+        """ X """
+        palette = []
+        for key, value in colorDict.items():
+            if isinstance(value, dict):
+                subpalette = self._harvest_leaves(value)
+                for subKey, subValue in subpalette:
+                    palette.append(
+                        (key + (" " if subKey else "") + subKey, subValue))
+
+            elif key == 'color':
+                palette.append(("", value))
+
+        return palette
 
 
 # ---MAIN---
 if __name__ == "__main__":
+
+    import os.path
     main()

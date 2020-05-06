@@ -11,5 +11,6 @@
     "cSpell.words": [
         "cardassembler"
     ],
-    "python.pythonPath": "C:\\Program Files\\GIMP 2\\bin\\python.exe"
+    "python.pythonPath": "C:\\Program Files\\GIMP 2\\bin\\python.exe",
+    "codemap.maxNestingLevel": 3,
 }
