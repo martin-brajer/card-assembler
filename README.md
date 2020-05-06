@@ -7,6 +7,7 @@ Card Assembler is a free and open-source plug-in for Gimp. Assembles an image ac
 * Gimp tools: single-colour layer, textbox, import layers from given \*.xcf file etc.
 * Load card layout information from an xml file blueprint.
 * Support command chaining, making templates possible.
+* Export colors used in blueprint to gimp palette.
 
 ## Wiki
 
