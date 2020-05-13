@@ -101,6 +101,6 @@ The only card there can be created by filling `example` into CardIDs field.
 The only card there can be created by filling `unique spell example` into CardIDs field. Colors can be exported by filling `color` into [PaletteID field](README.md#palette-creator-parameters).
 
 # License
-Card Assembler is licensed under the [MIT license](LICENSE)
+Card Assembler is licensed under the [MIT license](LICENSE).
 
 Feel free to comment, share ideas or report bugs.
