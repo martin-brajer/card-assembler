@@ -61,7 +61,7 @@ def initialize_toolbox(dataFolder, xmlFile):
     # eval(...) function inside its installation folder and direct
     # import from different folder raises 'access denied' error.
     sys.path.append(dataFolder)
-    import cardassembler_definitions
+    import CardAssembler_Definitions
 
     toolbox = Toolbox(dataFolder)
     toolbox.load_blueprint(
