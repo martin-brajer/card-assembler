@@ -66,7 +66,7 @@ def initialize_toolbox(dataFolder, xmlFile):
     toolbox = Toolbox(dataFolder)
     toolbox.load_blueprint(
         xmlFile,
-        blueprintClass=cardassembler_definitions.Blueprint)
+        blueprintClass=CardAssembler_Definitions.Blueprint)
 
     return toolbox
 
