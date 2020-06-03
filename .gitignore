@@ -1,12 +1,12 @@
 # My files.
 .vscode/*
 !.vscode/settings.json
-
-Data_image_items.xcf
-Blueprint.xml
-card2xml.xml
-card2xml.py
 TODO.txt
+
+Blueprint.xml
+CardIDs.txt
+Data_image_items.xcf
+Data_image_encounters.xcf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

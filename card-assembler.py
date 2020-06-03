@@ -118,11 +118,11 @@ class Toolbox(object):
 
     def _command_interpreter(self, command, commandName):
         """ Forward command to appropriate method. """
-        if 'commandType' not in command:
+        if 'cmdType' not in command:
             raise KeyError(
-                'Command "{}" is missing commandType tag.'.format(
+                'Command "{}" is missing cmdType tag.'.format(
                     commandName))
-        commandType = command['commandType']
+        commandType = command['cmdType']
 
         if commandType not in self.commandLib:
             raise KeyError(
