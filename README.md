@@ -84,6 +84,8 @@ For example: `<position parse="tuple">100, 125</position>`.
   - *justification (int) = 0*
   - *position (tuple) = (0, 0)*
   - *addToPosition (int) = 0*
+- hide
+  - *no parameters*
 
 Aditionally, **all commands** can use [`next` tag](README.md#nesting).
 

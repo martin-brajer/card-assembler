@@ -97,6 +97,7 @@ class Toolbox(object):
             'import_layer': self._command_import_layer,
             'group': self._command_group,
             'text': self._command_text,
+            'hide': self._command_hide,
         }
 
     def load_blueprint(self, xmlFile, blueprintClass):
@@ -128,6 +129,7 @@ class Toolbox(object):
                 'Unknown commandType "{}" of command "{}"'.format(
                     commandType, commandName))
 
+        print('Command "{}" of type "{}".'.format(commandName, commandType))
         self.commandLib[commandType](command)
 
     def _command_image(self, command):
@@ -229,7 +231,8 @@ class Toolbox(object):
             command['font'],
             fontsize, 0)
         self.image.add_layer(textLayer, command.get('addToPosition', 0))
-        textLayer.name = command.get('name', 'Text Layer')
+        if 'name' in command:
+            textLayer.name = command['name']
         GF.pdb.gimp_text_layer_set_color(
             textLayer, command.get('color', '#000000'))
         if 'size' in command:
@@ -243,6 +246,15 @@ class Toolbox(object):
             textLayer, command.get('justification', 0))
         GF.pdb.gimp_layer_set_offsets(
             textLayer, *command.get('position', (0, 0)))
+
+    def _command_hide(self, command):
+        """ Ignore command.
+
+        Meant for overrides - hiding a predefined layer.
+
+        No parameters.
+        """
+        pass
 
     def display_image(self):
         """ Display the created image. """
