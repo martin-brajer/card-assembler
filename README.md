@@ -42,7 +42,7 @@ Card Assembler works with tree structure. When calling the plug-in in Gimp, you 
 ## Nesting
 Command can contain any number of `next` tags. Each points to another node in the tree whose children are appended to the initial command. This tag can only add new tags, not rewrite the old ones. Intentional usage is inserting card specific tags first and then let `next` point to some more general version (i.e. template).
 
-It is usefull to create separate color dedicated subtree. See [Palette Creator parameters](README.md#palette-creator-parameters).
+It is useful to create separate color dedicated subtree. See [Palette Creator parameters](README.md#palette-creator-parameters).
 
 ## Parsing
 If a parameter type is not *string*, add attribute `parse` to the parameter's tag with value `int`, `float` or `tuple` as needed.
@@ -87,7 +87,7 @@ For example: `<position parse="tuple">100, 125</position>`.
 - hide
   - *no parameters*
 
-Aditionally, **all commands** can use [`next` tag](README.md#nesting).
+Additionally, **all commands** can use [`next` tag](README.md#nesting).
 
 # Examples
 There are two example blueprints in [`cardassembler_data`](../../tree/master/CardAssembler_Data) folder. One shows very simple blueprint to start with. The second one shows intended use.
