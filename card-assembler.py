@@ -97,6 +97,8 @@ class Toolbox(object):
             'import_layer': self._command_import_layer,
             'group': self._command_group,
             'text': self._command_text,
+            'select': self._command_select,
+            'mask': self._command_mask,
             'hide': self._command_hide,
         }
 
@@ -246,6 +248,62 @@ class Toolbox(object):
             textLayer, command.get('justification', 0))
         GF.pdb.gimp_layer_set_offsets(
             textLayer, *command.get('position', (0, 0)))
+
+    def _command_select(self, command):
+        """ New selection by percentage of image size.
+
+        Parameters: [mode(string)], [left(float)], [right(float)],
+            [top(float)], [bottom(float)].
+        """
+        if self.image is None:
+            raise AttributeError('Image to add the layer to not found.')
+
+        mode = command.get('mode', 'select')
+        if mode == 'deselect':
+            GF.pdb.gimp_selection_none(self.image)
+
+        elif mode == 'select':
+            x = round(GF.pdb.gimp_image_width(self.image)
+                      * command.get('left', 0) / 100)
+            y = round(GF.pdb.gimp_image_height(self.image)
+                      * command.get('top', 0) / 100)
+
+            width = round(GF.pdb.gimp_image_width(self.image)
+                          * command.get('right', 100) / 100) - x
+            height = round(GF.pdb.gimp_image_height(self.image)
+                           * command.get('bottom', 100) / 100) - y
+
+            if width <= 0:
+                raise ArithmeticError(
+                    'Parameter "left" must be lesser than "right".')
+            if height <= 0:
+                raise ArithmeticError(
+                    'Parameter "top" must be lesser than "bottom".')
+
+            GF.pdb.gimp_image_select_rectangle(
+                self.image,
+                0,  # GIMP_CHANNEL_OP_ADD
+                x, y, width, height)
+        else:
+            pass
+
+    def _command_mask(self, command):
+        """ Mask layer.
+
+        Create mask for given layer from given selection.
+
+        Parameters: layer(string), [<'select' commands>].
+        """
+        self._command_select(command)
+
+        layer = GF.pdb.gimp_image_get_layer_by_name(
+            self.image, command['targetLayer'])
+        mask = GF.pdb.gimp_layer_create_mask(
+            layer, 4)  # GIMP_ADD_SELECTION_MASK
+        GF.pdb.gimp_layer_add_mask(layer, mask)
+
+        command['mode'] = 'deselect'
+        self._command_select(command)
 
     def _command_hide(self, command):
         """ Ignore command.

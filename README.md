@@ -55,15 +55,15 @@ For example: `<position parse="tuple">100, 125</position>`.
   - name (string)
 - monochrome
   - size (tuple)
-  - color (string)
+  - color (string) - hex code
   - *name (string) = "Monochrome"*
   - *position (tuple) = (0, 0)*
-  - *addToPosition (int) = 0*
+  - *addToPosition (int) = 0* - `-1` adds to just defined group
 - import_layer_load
   - filename (string)
   - name (string)
 - import_layer
-  - targetFile (string) - use `filename` filled in import_layer_load
+  - targetFile (string) - use `name` filled in import_layer_load
   - targetLayer (string)
   - *name (string) = targetLayer*
   - *position (tuple) = (0, 0)*
@@ -75,15 +75,24 @@ For example: `<position parse="tuple">100, 125</position>`.
   - text (string)
   - font (string)
   - fontSize (int)
-  - *textScale (float) = 1*
+  - *fontScale (float) = 1*
   - *name (string) = "Text Layer"*
   - *color (string) = "#000000"*
   - *size (tuple) = autosize*
   - *lineSpacing (float) = 0*
   - *letterSpacing (float) = 0*
-  - *justification (int) = 0*
+  - *justification (int) = 0* - left: `0`, right: `1`, center: `2`, fill: `3`
   - *position (tuple) = (0, 0)*
   - *addToPosition (int) = 0*
+- select
+  - *mode(string) = "select"* - possible values: `select`, `deselect`, any other
+  - *left(float) = 0* - dimensions in percentage of image size
+  - *right(float) = 100*
+  - *top(float) = 0*
+  - *bottom(float) = 100*
+- mask
+  - layer(string)
+  - *<`select` commands>*
 - hide
   - *no parameters*
 
