@@ -10,8 +10,13 @@
         "#9370DB",
     ],
     "cSpell.words": [
-        "cardassembler"
+        "bysource",
+        "cardassembler",
+        "genindex",
+        "maxdepth",
+        "modindex",
+        "recommonmark",
+        "toctree"
     ],
-    "python.pythonPath": "C:\\Program Files\\GIMP 2\\bin\\python.exe",
     "codemap.maxNestingLevel": 3,
 }

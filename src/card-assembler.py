@@ -4,13 +4,14 @@ Gimp gimpfu plug-in for board game card creation.
 
 Code not using gimpfu is imported from CardAssembler_Definitions.py,
 which is located in data folder.
-Written for Gimp 2.10.18, which uses python 2.7.17.
+Written for Gimp 2.10.18 which uses python 2.7.17.
 """
 
 # ---IMPORTS---
 import gimpfu as GF
-import os
 import sys
+import os
+
 
 # ---CONSTANTS---
 
@@ -60,13 +61,13 @@ def initialize_toolbox(dataFolder, xmlFile):
     # This weird import is forced by Gimp running this script through
     # eval(...) function inside its installation folder and direct
     # import from different folder raises 'access denied' error.
-    sys.path.append(dataFolder)
-    import CardAssembler_Definitions
+    sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+    import blueprint
 
     toolbox = Toolbox(dataFolder)
     toolbox.load_blueprint(
         xmlFile,
-        blueprintClass=CardAssembler_Definitions.Blueprint)
+        blueprintClass=blueprint.Blueprint)
 
     return toolbox
 

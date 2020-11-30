@@ -1,12 +1,7 @@
 # My files.
-.vscode/*
-!.vscode/settings.json
 TODO.txt
-
-Blueprint.xml
-CardIDs.txt
-Data_image_items.xcf
-Data_image_encounters.xcf
+# copytogimp.bat
+docs/build/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
