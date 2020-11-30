@@ -72,6 +72,8 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+autodoc_mock_imports = ["gimpfu"]
+
 # Add Python version number to the default address to correctly reference
 # the Python standard library
 intersphinx_mapping = {

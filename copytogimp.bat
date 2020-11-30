@@ -9,13 +9,13 @@ IF "%1" == "" (
 
 @REM This script folder, then src subfolder
 set src=%~dp0\src\
-set name=card-assembler
+set name=cardassembler
 set pluginfolder=%gimpplugins%%name%
 
 IF NOT EXIST %pluginfolder% MKDIR %pluginfolder%
 
 copy %src% %pluginfolder%
-@REM copy %src%card-assembler.py %pluginfolder%
+@REM copy %src%cardassembler.py %pluginfolder%
 @REM copy %src%blueprint.py %pluginfolder%
 
 @REM cmd /k

@@ -1,8 +1,7 @@
 # My files.
 TODO.txt
-# copytogimp.bat
+copytogimp.bat
 index.html.Ink
-docs/build/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

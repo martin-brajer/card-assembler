@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Gimp gimpfu plug-in for board game card creation.
+Main script which handles communication with Gimp.
 
-Code not using gimpfu is imported from CardAssembler_Definitions.py,
-which is located in data folder.
-Written for Gimp 2.10.18 which uses python 2.7.17.
+All code using `gimpfu <https://www.gimp.org/docs/python/index.html>`_
+is here. The rest can be found in :mod:`blueprint` module.
+Written for Gimp 2.10.18 which uses
+`Python 2.7.18 <https://docs.python.org/release/2.7.18/>`_.
 """
 
 # ---IMPORTS---
@@ -17,6 +18,10 @@ import os
 
 
 # ---FUNCTIONS---
+def main():
+    pass
+
+
 def default_data_folder():
     """ Gimp's folder in user folder. """
     dataFolder = os.path.expanduser('~')
@@ -29,10 +34,11 @@ def default_data_folder():
 def card_creator(dataFolder, xmlFile, cardIDs, save):
     """ Creates board-game cards.
 
-    Registered function by GF.register. Main functionality.
+    Registered function by GF.register. Main plugin functionality.
     """
     toolbox = initialize_toolbox(dataFolder, xmlFile)
-
+    print(sys.version)
+    input()
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
 
@@ -384,3 +390,7 @@ GF.register(
 )
 
 GF.main()
+
+# ---MAIN---
+if __name__ == "__main__":
+    main()

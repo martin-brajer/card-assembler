@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Supplemental script to gimp plug-in CardCreator.
+Supplemental script which handles data manipulation.
 
-Introduces Blueprint class which can read xml file and
+Introduces :class:`Blueprint` class which can read `xml` files and
 produce layout list, which is used by the main script.
 """
 # ---IMPORTS---
@@ -15,7 +15,6 @@ import operator
 
 
 def main():
-    """ Testing area. """
     import os.path
     blueprint = Blueprint(os.path.dirname(__file__) + '/Blueprint.xml')
     layout = blueprint.generate_layout_dict("unique item example")
@@ -31,6 +30,9 @@ class Blueprint(object):
 
     Can read xml file and produce layout list,
     which is used by the main script.
+
+    :param filePath: Blueprint xml folder
+    :type filePath: str
     """
 
     def __init__(self, filePath):

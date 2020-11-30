@@ -1,8 +1,8 @@
-src
-===
+Library
+=======
 
 .. toctree::
    :maxdepth: 4
 
    blueprint
-   card-assembler
+   cardassembler
