@@ -10,14 +10,20 @@
         "#9370DB",
     ],
     "cSpell.words": [
+        "automodule",
         "bysource",
         "cardassembler",
         "genindex",
         "maxdepth",
         "modindex",
         "recommonmark",
-        "toctree"
+        "toctree",
+        "undoc"
     ],
     "codemap.maxNestingLevel": 3,
     "autoDocstring.docstringFormat": "sphinx",
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "restructuredtext.confPath": "${workspaceFolder}\\docs\\source",
 }

@@ -11,6 +11,7 @@ Welcome to Card Assembler's documentation!
    :caption: Contents:
 
    readme_link
+   layerTypes
    modules/modules
 
 Indices and tables

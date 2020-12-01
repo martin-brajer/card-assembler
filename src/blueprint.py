@@ -3,11 +3,10 @@
 Supplemental script which handles data manipulation.
 
 Introduces :class:`Blueprint` class which can read `xml` files and
-produce layout list, which is used by the main script.
+produce layout list, which is used by the main script :mod:`cardassembler`.
 """
 # ---IMPORTS---
 import xml.etree.ElementTree as ET
-import operator
 
 # ---CONSTANTS---
 
@@ -16,8 +15,8 @@ import operator
 
 def main():
     import os.path
-    blueprint = Blueprint(os.path.dirname(__file__) + '/Blueprint.xml')
-    layout = blueprint.generate_layout_dict("unique item example")
+    blueprint = Blueprint('D:\Programming\Python\Gimp\cardassembler_data\Blueprint.xml')
+    layout = blueprint.generate_layout("unique item example")
     palette = blueprint.generate_palette("color")
     pass
 
@@ -25,26 +24,38 @@ def main():
 # ---CLASSES---
 
 
-class Blueprint(object):
+class Blueprint():
     """ Blueprint information handling class.
 
-    Can read xml file and produce layout list,
-    which is used by the main script.
+    Can read xml file, produce layout list and palettes.
 
     :param filePath: Blueprint xml folder
     :type filePath: str
     """
-
+    
     def __init__(self, filePath):
+        #: Tree structure (:class:`dict`) of card data
         self.data = self._load_data(filePath)
 
     def _load_data(self, filePath):
-        """ Load blueprint (xml file) into dictionary tree. """
-        root = ET.parse(filePath).getroot()
-        return self.xml2dict(root)
+        """ Load blueprint (xml file) into dictionary tree.
 
-    def xml2dict(self, parent):
-        """ Recursive translation from ElementTree to dictionary tree. """
+        :param filePath: Path to the \*.xml file to load
+        :type filePath: str
+        :return: Tree structure of card data
+        :rtype: dict
+        """        
+        root = ET.parse(filePath).getroot()
+        return self._xml2dict(root)
+
+    def _xml2dict(self, parent):
+        """ Recursive translation from ElementTree to dictionary tree.
+
+        :param parent: [description]
+        :type parent: [type]
+        :return: [description]
+        :rtype: [type]
+        """        
         newDict = {}
         for child in parent:
             key = child.tag
@@ -66,12 +77,21 @@ class Blueprint(object):
 
             # Go down the level.
             else:
-                newDict[key] = self.xml2dict(child)
+                newDict[key] = self._xml2dict(child)
 
         return newDict
 
     def _parse(self, text, method):
-        """ ElementTree.element.text to various python types. """
+        """ ElementTree.element.text to various python types.
+
+        :param text: [description]
+        :type text: [type]
+        :param method: [description]
+        :type method: [type]
+        :raises KeyError: [description]
+        :return: [description]
+        :rtype: [type]
+        """        
         if method == 'int':
             return int(text)
 
@@ -86,19 +106,30 @@ class Blueprint(object):
 
         raise KeyError('Method "{}" not found!'.format(method))
 
-    def generate_layout_dict(self, startBy):
-        """ Generate layout given starting position.
+    def generate_layout(self, startBy):
+        """ Generate card layout given starting position.
 
-        Starting position children are sorted
-        alphabetically (name them accordingly).
-        """
+        Starting position children are sorted alphabetically (name them accordingly).
+
+        :param startBy: Path through data tree, space separated
+        :type startBy: str
+        :return: Tree structure of chosen card data
+        :rtype: dict
+        """        
         return self._stepIn({}, startBy)
 
     def _stepIn(self, layout, thisStep):
         """ Browse data guided by 'next' tag.
 
         Does not overwrite (first in stays).
-        """
+
+        :param layout: [description]
+        :type layout: [type]
+        :param thisStep: [description]
+        :type thisStep: [type]
+        :return: [description]
+        :rtype: [type]
+        """        
         nextSteps = []
         for key, value in self._nextDataset(thisStep).items():
             # Next is not written into layout.
@@ -126,7 +157,13 @@ class Blueprint(object):
         """ Browse ElementTree based on argument indicator.
 
         Individual node turns must be separated by space.
-        """
+
+        :param nextSteps: [description]
+        :type nextSteps: [type]
+        :raises KeyError: [description]
+        :return: [description]
+        :rtype: [type]
+        """        
         data = self.data
         # Down the rabbit hole!
         for nextStep in nextSteps.split(' '):
@@ -136,21 +173,31 @@ class Blueprint(object):
                 raise KeyError(
                     'While browsing the data tree by "{}", keyword "{}" was not found.'.format(
                         nextSteps, nextStep))
-
         return data
 
     def generate_palette(self, startBy):
-        """ Make palette out of used colors.
+        """ Make palette out of colors used by cards.
 
         To be used in another mini plug-in to import palette into Gimp.
-        """
+
+        :param startBy: Path through data tree, space separated
+        :type startBy: str
+        :return: Pairs of name and color
+        :rtype: list
+        """        
         palette = self._harvest_leaves(self._nextDataset(startBy))
         palette.sort()
         palette.sort(key=lambda x: x[0].count(' '))
         return palette
 
     def _harvest_leaves(self, colorDict):
-        """ X """
+        """ Harvest leaves.
+
+        :param colorDict: [description]
+        :type colorDict: [type]
+        :return: [description]
+        :rtype: [type]
+        """        
         palette = []
         for key, value in colorDict.items():
             if isinstance(value, dict):

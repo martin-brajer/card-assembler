@@ -6,391 +6,447 @@ All code using `gimpfu <https://www.gimp.org/docs/python/index.html>`_
 is here. The rest can be found in :mod:`blueprint` module.
 Written for Gimp 2.10.18 which uses
 `Python 2.7.18 <https://docs.python.org/release/2.7.18/>`_.
+
+Gimp runs this script through :func:`eval()` function inside its
+installation folder and direct import from different folder raises
+*access denied* error.
 """
 
 # ---IMPORTS---
-import gimpfu as GF
+import gimpfu
 import sys
 import os
-
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+import blueprint  # Same folder as this script.
 
 # ---CONSTANTS---
 
 
 # ---FUNCTIONS---
-def main():
-    pass
-
-
-def default_data_folder():
-    """ Gimp's folder in user folder. """
-    dataFolder = os.path.expanduser('~')
-    # Rest of the Gimp plug-in path contains gimp version
-    # and therefore can change. Any folder can be chosen.
-    dataFolder += '/AppData/Roaming/GIMP/'
-    return dataFolder
-
-
 def card_creator(dataFolder, xmlFile, cardIDs, save):
-    """ Creates board-game cards.
-
-    Registered function by GF.register. Main plugin functionality.
+    """ Create board-game cards.
+    
+    Registered function by ``gimpfu.register()``. Main plugin functionality.
+    
+    :param dataFolder: Blueprints (*\*.xml*) and data images (*\*.xcf*) folder
+    :type dataFolder: str
+    :param xmlFile: Blueprint to be used (with extension)
+    :type xmlFile: str
+    :param cardIDs: Newline-separated paths to starting nodes.
+    :type cardIDs: str
+    :param save: Save the images after generation
+    :type save: bool
+    :raises ValueError: If cardIDs are empty.
     """
-    toolbox = initialize_toolbox(dataFolder, xmlFile)
-    print(sys.version)
-    input()
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
 
+    toolbox = Toolbox(dataFolder, xmlFile)
     for cardID in cardIDs.split('\n'):
         toolbox.create_image(cardID)
-        toolbox.display_image()
         if save:
             toolbox.save_image()
 
 
 def palette_creator(dataFolder, xmlFile, paletteID, name):
-    """ Creates palette.
+    """ Create palette.
 
-    Registered function by GF.register. Supplemental functionality.
-    """
-    toolbox = initialize_toolbox(dataFolder, xmlFile)
+    Registered function by ``gimpfu.register()``. Supplemental plugin functionality.
 
+    :param dataFolder: Blueprints (*\*.xml*) and data images (*\*.xcf*) folder
+    :type dataFolder: str
+    :param xmlFile: Blueprint to be used (with extension)
+    :type xmlFile: str
+    :param paletteID: Path to the starting node.
+    :type paletteID: str
+    :param name: Name of the created palette
+    :type name: str
+    :raises ValueError: If the paletteID is empty.
+    """    
     if not paletteID:
         raise ValueError('No palette ID inserted!')
 
+    toolbox = Toolbox(dataFolder, xmlFile)
     toolbox.create_palette(paletteID, name)
-
-
-def initialize_toolbox(dataFolder, xmlFile):
-    """ Common initialization used by all registered functions. """
-    # This weird import is forced by Gimp running this script through
-    # eval(...) function inside its installation folder and direct
-    # import from different folder raises 'access denied' error.
-    sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-    import blueprint
-
-    toolbox = Toolbox(dataFolder)
-    toolbox.load_blueprint(
-        xmlFile,
-        blueprintClass=blueprint.Blueprint)
-
-    return toolbox
 
 
 # ---CLASSES---
 
 
-class Toolbox(object):
+class Toolbox():
     """ Blueprint-to-image manipulation tool.
 
     This class offers means for creating common card components
     (i.e. text, icons). Then completes the image and optionally
-    saves it. Probably you'll want to fine-tune it manually.
+    saves it. Probably you'll want to fine-tune the image manually.
+
+    :param dataFolder: Blueprints (*\*.xml*) and data images (*\*.xcf*) folder
+    :type dataFolder: str
+    :param xmlFile: Blueprint to be used (with extension)
+    :type xmlFile: str
     """
 
-    def __init__(self, dataFolder):
-        self.blueprint = None
+    def __init__(self, dataFolder, xmlFile):
         self.dataFolder = dataFolder + '/'
+        self.blueprint = blueprint.Blueprint(self.dataFolder + xmlFile)
 
         self.gimpImage = None
-        self.gimpImageImport = {}  # {name: Gimp image object}
+        self.gimpImageImported = {}  # dict{ name: <Gimp image object> }
 
-        # Specifies how a command dict is interpreted.
-        self.commandLib = {
-            'image': self._command_image,
-            'monochrome': self._command_monochrome,
-            'import_layer_load': self._command_import_layer_load,
-            'import_layer': self._command_import_layer,
-            'group': self._command_group,
-            'text': self._command_text,
-            'select': self._command_select,
-            'mask': self._command_mask,
-            'hide': self._command_hide,
+        #: Directory used in :meth:`save_image`. Relative to :attr:`dataFolder` directory.
+        self.saveDirectory = 'Saved images/'
+
+        # Specifies how a layer type is interpreted. Type: :class:`dict` { name: function }
+        self.addLayer = {
+            'image': self._layer_image,
+            'monochrome': self._layer_monochrome,
+            'import_layer_load': self._layer_import_layer_load,
+            'import_layer': self._layer_import_layer,
+            'group': self._layer_group,
+            'text': self._layer_text,
+            'select': self._layer_select,
+            'mask': self._layer_mask,
+            'hide': self._layer_hide,
         }
 
-    def load_blueprint(self, xmlFile, blueprintClass):
-        """ Initialize Blueprint class from supplemental file. """
-        self.blueprint = blueprintClass(self.dataFolder + xmlFile)
-
     def create_image(self, cardID):
-        """ Blueprint to image.
+        """Blueprint to image.
 
-        Layout consists of commands, which are called alphabetically by name.
-        """
+        Layout consists of commands which are called alphabetically by name.
+
+        :param cardID: Path to the starting node.
+        :type cardID: str
+        :raises RuntimeError: If there is no blueprint
+        :raises KeyError: If any of the layers has no type
+        :raises ValueError: If any of the layers has unknown type
+        """        
         if self.blueprint is None:
-            raise AttributeError('Blueprint must be initialized first!')
+            raise RuntimeError('Blueprint must be initialized first!')
 
-        layout = self.blueprint.generate_layout_dict(cardID)
-        for commandName in sorted(layout.keys()):
-            self._command_interpreter(layout[commandName], commandName)
+        layout = self.blueprint.generate_layout(cardID)
+        for layerName in sorted(layout.keys()):
+            layer = layout[layerName]
+            
+            LAYERTYPE = 'layerType'
+            if LAYERTYPE not in layer:
+                raise KeyError('Layer "{0}" is missing {1} tag.'.format(layerName, LAYERTYPE))
 
-    def _command_interpreter(self, command, commandName):
-        """ Forward command to appropriate method. """
-        if 'cmdType' not in command:
-            raise KeyError(
-                'Command "{}" is missing cmdType tag.'.format(
-                    commandName))
-        commandType = command['cmdType']
+            layerType = layer[LAYERTYPE]
+            if layerType not in self.addLayer:
+                raise ValueError('Unknown layer type "{0}" in "{1}"'.format(layerType, layerName))
 
-        if commandType not in self.commandLib:
-            raise KeyError(
-                'Unknown commandType "{}" of command "{}"'.format(
-                    commandType, commandName))
+            self.addLayer[layerType](layer)
+            print('Layer "{0}" of type "{1}" done.'.format(layerName, layerType))
 
-        print('Command "{}" of type "{}".'.format(commandName, commandType))
-        self.commandLib[commandType](command)
+        display = gimpfu.pdb.gimp_display_new(self.image)
 
-    def _command_image(self, command):
+    def _layer_image(self, layer):
         """ Create new image. Needed for layer creation.
 
-        Parameters: size(tuple), [name(string)].
+        :param size: Image dimensions in pixels
+        :type size: tuple
+        :param name: Image name, defaults to "Card Assembler Image"
+        :type name: str
         """
-        self.image = GF.pdb.gimp_image_new(
-            command['size'][0], command['size'][1], GF.RGB)
-        GF.pdb.gimp_image_set_filename(
-            self.image, command.get('name', 'Card Assembler Image'))
+        self.image = gimpfu.pdb.gimp_image_new(
+            layer['size'][0], layer['size'][1], gimpfu.RGB)
+        gimpfu.pdb.gimp_image_set_filename(
+            self.image, layer.get('name', 'Card Assembler Image'))
 
-    def _command_monochrome(self, command):
-        """ One-colour-filled-layer.
+    def _layer_monochrome(self, layer):
+        """ Single colour filled layer.
 
-        Parameters: size(tuple), color(string),
-            [name(string)], [position(tuple)],
-            [addToPosition(int)].
+        :param size: Layer dimensions in pixels
+        :type size: tuple
+        :param color: Hex code
+        :type color: str
+        :param name: Layer name, defaults to "Monochrome"
+        :type name: str, optional
+        :param position: Defaults to (0, 0)
+        :type position: tuple, optional
+        :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
+        :type addToPosition: int, optional
+        :raises RuntimeError: If there is no image
         """
         if self.image is None:
-            raise AttributeError('Image to add the layer to not found.')
+            raise RuntimeError('Image to add the layer to not found.')
 
-        layer = GF.pdb.gimp_layer_new(
+        newLayer = gimpfu.pdb.gimp_layer_new(
             self.image,
-            command['size'][0], command['size'][1],
-            GF.RGB,
-            command.get('name', 'Monochrome'),
+            layer['size'][0], layer['size'][1],
+            gimpfu.RGB,
+            layer.get('name', 'Monochrome'),
             100,
-            GF.LAYER_MODE_NORMAL)
-        self.image.add_layer(layer, command.get('addToPosition', 0))
-        if 'position' in command:
-            GF.pdb.gimp_layer_set_offsets(layer, *command['position'])
-        GF.pdb.gimp_context_set_foreground(command['color'])
-        GF.pdb.gimp_drawable_edit_bucket_fill(layer, 0, 0, 0)
+            gimpfu.LAYER_MODE_NORMAL)
+        self.image.add_layer(newLayer, layer.get('addToPosition', 0))
+        if 'position' in layer:
+            gimpfu.pdb.gimp_layer_set_offsets(newLayer, *layer['position'])
+        gimpfu.pdb.gimp_context_set_foreground(layer['color'])
+        gimpfu.pdb.gimp_drawable_edit_bucket_fill(newLayer, 0, 0, 0)
 
-    def _command_import_layer_load(self, command):
+    def _layer_import_layer_load(self, layer):
         """ Load new data image.
 
-        Must be in Data folder. Filename is specified in xml file.
-        Name parameter is used in xml file to reference
-        the imported file. That's why it's not optional parameter.
+        The file has to be in the data folder. Filename is specified in the
+        xml file. Name parameter is used in xml file to reference the imported
+        file. That's why it's not optional parameter.
 
-        Parameters: filename(string), name(string).
+        :param filename: See description
+        :type filename: str
+        :param name: Name the data for future use by ``import_layer``
+        :type name: str
+        
+        :raises RuntimeError: If there is no image
         """
-        filepath = self.dataFolder + command['filename']
-        self.gimpImageImport[command['name']] = GF.pdb.gimp_file_load(
+        filepath = self.dataFolder + layer['filename']
+        self.gimpImageImported[layer['name']] = gimpfu.pdb.gimp_file_load(
             filepath, filepath)
 
-    def _command_import_layer(self, command):
+    def _layer_import_layer(self, layer):
         """ Copy layer from a data image.
 
-        Parameters: targetFile(string), targetLayer(string),
-            [addToPosition(int)], [name(string)], [position(tuple)].
+        :param targetFile: Use **name** filled in ``import_layer_load``
+        :type targetFile: str
+        :param targetLayer: Name of the layer to be imported in the target file
+        :type targetLayer: str
+        :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
+        :type addToPosition: int, optional
+        :param name: Layer name, defaults to **targetLayer**
+        :type name: str, optional
+        :param position: Defaults to (0, 0)
+        :type position: tuple, optional
+        :raises RuntimeError: If there is no image
         """
         if self.image is None:
-            raise AttributeError('Image to add the layer to not found.')
+            raise RuntimeError('Image to add the layer to not found.')
 
-        oldLayer = GF.pdb.gimp_image_get_layer_by_name(
-            self.gimpImageImport[command['targetFile']], command['targetLayer'])
-        newLayer = GF.pdb.gimp_layer_new_from_drawable(
+        oldLayer = gimpfu.pdb.gimp_image_get_layer_by_name(
+            self.gimpImageImported[layer['targetFile']], layer['targetLayer'])
+        newLayer = gimpfu.pdb.gimp_layer_new_from_drawable(
             oldLayer, self.image)
-        self.image.add_layer(newLayer, command.get('addToPosition', 0))
-        newLayer.name = command.get('name', command['targetLayer'])
-        GF.pdb.gimp_layer_set_offsets(
-            newLayer, *command.get('position', (0, 0)))
+        self.image.add_layer(newLayer, layer.get('addToPosition', 0))
+        newLayer.name = layer.get('name', layer['targetLayer'])
+        gimpfu.pdb.gimp_layer_set_offsets(
+            newLayer, *layer.get('position', (0, 0)))
 
-    def _command_group(self, command):
+    def _layer_group(self, layer):
         """ Create new layer group.
 
-        To fill next layers in, set its 'addToPosition' parameter to -1.
+        To fill next layers in, set theirs **addToPosition** parameter to -1.
 
-        Parameters: [addToPosition(int)], [name(string)].
+        :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
+        :type addToPosition: int, optional
+        :param name: Group name, defaults to "Group"
+        :type name: str, optional
+        :raises RuntimeError: If there is no image
         """
         if self.image is None:
-            raise AttributeError('Image to add the layer to not found.')
+            raise RuntimeError('Image to add the layer to not found.')
 
-        layerGroup = GF.pdb.gimp_layer_group_new(self.image)
-        self.image.add_layer(layerGroup, command.get('addToPosition', 0))
-        layerGroup.name = command.get('name', 'Group')
+        layerGroup = gimpfu.pdb.gimp_layer_group_new(self.image)
+        self.image.add_layer(layerGroup, layer.get('addToPosition', 0))
+        layerGroup.name = layer.get('name', 'Group')
 
-    def _command_text(self, command):
+    def _layer_text(self, layer):
         """ Text layer.
 
-        If Size is not filled in, 'dynamic' mode is used.
-        Justification values: left(0), right(1), center(2), fill(3).
-
-        Parameters: text(string), font(string), fontSize(int),
-            [textScale(float)], [addToPosition(int)], [name(string)],
-            [color(string)], [size(tuple)], [lineSpacing(float)],
-            [letterSpacing(float)], [justification(int)], [position(tuple)].
+        :param text: Text
+        :type size: str
+        :param font: Font name
+        :type font: str
+        :param fontSize: Font size
+        :type fontSize: int
+        :param fontScale: Multiply **fontSize**, defaults to 1
+        :type fontScale: float, optional
+        :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
+        :type addToPosition: int, optional
+        :param name: Layer name, defaults to "Text Layer" (Gimp default)
+        :type name: str, optional
+        :param color: Text color in hex code, defaults to “#000000” (black)
+        :type color: str, optional
+        :param size: Layer dimensions in pixels, defaults to *autosize*
+        :type size: tuple
+        :param lineSpacing: Line separation change, defaults to 0
+        :type lineSpacing: float, optional
+        :param letterSpacing: Letters separation change, defaults to 0
+        :type letterSpacing: float, optional
+        :param justification: Either left(0), right(1), center(2) or fill(3), defaults to 0
+        :type justification: int, optional
+        :param position: Defaults to (0, 0)
+        :type position: tuple, optional
+        :raises RuntimeError: If there is no image
         """
         if self.image is None:
-            raise AttributeError('Image to add the layer to not found.')
+            raise RuntimeError('Image to add the layer to not found.')
 
-        fontsize = command['fontSize'] * command.get('textScale', 1)
-        textLayer = GF.pdb.gimp_text_layer_new(
+        fontsize = layer['fontSize'] * layer.get('textScale', 1)
+        textLayer = gimpfu.pdb.gimp_text_layer_new(
             self.image,
-            command['text'],
-            command['font'],
+            layer['text'],
+            layer['font'],
             fontsize, 0)
-        self.image.add_layer(textLayer, command.get('addToPosition', 0))
-        if 'name' in command:
-            textLayer.name = command['name']
-        GF.pdb.gimp_text_layer_set_color(
-            textLayer, command.get('color', '#000000'))
-        if 'size' in command:
-            GF.pdb.gimp_text_layer_resize(
-                textLayer, *command['size'])
-        GF.pdb.gimp_text_layer_set_line_spacing(
-            textLayer, command.get('lineSpacing', 0))
-        GF.pdb.gimp_text_layer_set_letter_spacing(
-            textLayer, command.get('letterSpacing', 0))
-        GF.pdb.gimp_text_layer_set_justification(
-            textLayer, command.get('justification', 0))
-        GF.pdb.gimp_layer_set_offsets(
-            textLayer, *command.get('position', (0, 0)))
+        self.image.add_layer(textLayer, layer.get('addToPosition', 0))
+        if 'name' in layer:
+            textLayer.name = layer['name']
+        gimpfu.pdb.gimp_text_layer_set_color(
+            textLayer, layer.get('color', '#000000'))
+        if 'size' in layer:
+            gimpfu.pdb.gimp_text_layer_resize(
+                textLayer, *layer['size'])
+        gimpfu.pdb.gimp_text_layer_set_line_spacing(
+            textLayer, layer.get('lineSpacing', 0))
+        gimpfu.pdb.gimp_text_layer_set_letter_spacing(
+            textLayer, layer.get('letterSpacing', 0))
+        gimpfu.pdb.gimp_text_layer_set_justification(
+            textLayer, layer.get('justification', 0))
+        gimpfu.pdb.gimp_layer_set_offsets(
+            textLayer, *layer.get('position', (0, 0)))
 
-    def _command_select(self, command):
+    def _layer_select(self, layer):
         """ New selection by percentage of image size.
 
-        Parameters: [mode(string)], [left(float)], [right(float)],
-            [top(float)], [bottom(float)].
+        :param mode: Either "select" or "deselect", defaults to the former one
+        :type mode: str
+        :param left: Left edge position in percentage of the image size, defaults to 0
+        :type left: float, optional
+        :param right: Right edge position in percentage of the image size, defaults to 100
+        :type right: float, optional
+        :param top: Top edge position in percentage of the image size, defaults to 0
+        :type top: float, optional
+        :param botton: Bottom edge position in percentage of the image size, defaults to 100
+        :type bottom: float, optional
+        :raises RuntimeError: If there is no image
+        :raises ArithmeticError: If width is not positive
+        :raises ArithmeticError: If height is not positive
+        :raises ValueError: If mode is unknown
         """
         if self.image is None:
-            raise AttributeError('Image to add the layer to not found.')
+            raise RuntimeError('Image to add the layer to not found.')
 
-        mode = command.get('mode', 'select')
-        if mode == 'deselect':
-            GF.pdb.gimp_selection_none(self.image)
+        mode = layer.get('mode', 'select')
+        if mode == 'select':
+            x = round(gimpfu.pdb.gimp_image_width(self.image)
+                      * layer.get('left', 0) / 100)
+            y = round(gimpfu.pdb.gimp_image_height(self.image)
+                      * layer.get('top', 0) / 100)
 
-        elif mode == 'select':
-            x = round(GF.pdb.gimp_image_width(self.image)
-                      * command.get('left', 0) / 100)
-            y = round(GF.pdb.gimp_image_height(self.image)
-                      * command.get('top', 0) / 100)
-
-            width = round(GF.pdb.gimp_image_width(self.image)
-                          * command.get('right', 100) / 100) - x
-            height = round(GF.pdb.gimp_image_height(self.image)
-                           * command.get('bottom', 100) / 100) - y
+            width = round(gimpfu.pdb.gimp_image_width(self.image)
+                          * layer.get('right', 100) / 100) - x
+            height = round(gimpfu.pdb.gimp_image_height(self.image)
+                           * layer.get('bottom', 100) / 100) - y
 
             if width <= 0:
                 raise ArithmeticError(
-                    'Parameter "left" must be lesser than "right".')
+                    'Select: parameter "left" must be lesser than "right".')
             if height <= 0:
                 raise ArithmeticError(
-                    'Parameter "top" must be lesser than "bottom".')
+                    'Select: parameter "top" must be lesser than "bottom".')
 
-            GF.pdb.gimp_image_select_rectangle(
+            gimpfu.pdb.gimp_image_select_rectangle(
                 self.image,
                 0,  # GIMP_CHANNEL_OP_ADD
                 x, y, width, height)
-        else:
-            pass
+        
+        elif mode == 'deselect':
+            gimpfu.pdb.gimp_selection_none(self.image)
 
-    def _command_mask(self, command):
+        else:
+            raise ValueError('Select: unknown mode.')
+
+    def _layer_mask(self, layer):
         """ Mask layer.
 
         Create mask for given layer from given selection.
 
-        Parameters: layer(string), [<'select' commands>].
+        :param layer: Target layer to select from
+        :type layer: str
+        :param parameters: Other parameters to be passed to ``select``
+        :type parameters: ``select``
         """
-        self._command_select(command)
+        self._layer_select(layer)
 
-        layer = GF.pdb.gimp_image_get_layer_by_name(
-            self.image, command['targetLayer'])
-        mask = GF.pdb.gimp_layer_create_mask(
-            layer, 4)  # GIMP_ADD_SELECTION_MASK
-        GF.pdb.gimp_layer_add_mask(layer, mask)
+        newLayer = gimpfu.pdb.gimp_image_get_layer_by_name(
+            self.image, layer['targetLayer'])
+        mask = gimpfu.pdb.gimp_layer_create_mask(
+            newLayer, 4)  # GIMP_ADD_SELECTION_MASK
+        gimpfu.pdb.gimp_layer_add_mask(newLayer, mask)
 
-        command['mode'] = 'deselect'
-        self._command_select(command)
+        layer['mode'] = 'deselect'
+        self._layer_select(layer)
 
-    def _command_hide(self, command):
+    def _layer_hide(self, layer):
         """ Ignore command.
 
-        Meant for overrides - hiding a predefined layer.
-
-        No parameters.
+        Meant for overrides, i.e. hiding a predefined (template) layer.
         """
         pass
 
-    def display_image(self):
-        """ Display the created image. """
-        display = GF.pdb.gimp_display_new(self.image)
-
     def save_image(self):
-        """ Save the image as <image.name>.xcf into 'Saved images' subfolder. """
-        directory = self.dataFolder + 'Saved images/'
+        """ Save the image as **image.name**.xcf into 'Saved images' subfolder. """
+        directory = self.dataFolder + self.saveDirectory
         if not os.path.exists(directory):
             os.makedirs(directory)
-        filename = directory + GF.pdb.gimp_image_get_name(self.image) + '.xcf'
-        GF.pdb.gimp_xcf_save(0, self.image, None, filename, filename)
+            print('Directory created: {0}'.format(directory))
+        filename = directory + gimpfu.pdb.gimp_image_get_name(self.image) + '.xcf'
+        gimpfu.pdb.gimp_xcf_save(0, self.image, None, filename, filename)
 
     def create_palette(self, paletteID, name):
-        """Blueprint to palette.
+        """ Blueprint to palette.
 
         Colors are sorted by their branch hight and then alphabetically.
-        """
-        palette = GF.pdb.gimp_palette_new(name)
-        GF.pdb.gimp_palette_set_columns(palette, 1)
+
+        :param paletteID: Path to the starting node.
+        :type paletteID: str
+        :param name: Created palette name
+        :type name: str
+        """        
+        palette = gimpfu.pdb.gimp_palette_new(name)
+        gimpfu.pdb.gimp_palette_set_columns(palette, 1)
 
         for name, color in self.blueprint.generate_palette(paletteID):
-            GF.pdb.gimp_palette_add_entry(palette, name, color)
+            gimpfu.pdb.gimp_palette_add_entry(palette, name, color)
 
 
 # ---REGISTER---
 
-GF.register(
-    "MB_palette_assembler",  # Name registered in Procedure Browser (blurb).
-    # Widget title (proc_name).
-    "Creates palette.\n\nGimp plug-in folder:\n<user>/AppData/Roaming/GIMP/<version>/plug-ins/",
-    "Creates palette",  # Help.
+gimpfu.register(
+    "CA_palette_assembler",  # Name registered in Procedure Browser (blurb).
+    "Create palette.",  # Widget title (proc_name).
+    "Create palette.",  # Help.
     "Martin Brajer",  # Author.
     "Martin Brajer",  # Copyright holder.
     "May 2020",  # Date.
     "Palette Assembler",  # Menu Entry (label).
     "",  # Image Type - no image required (imagetypes).
     [  # (params).
-        (GF.PF_DIRNAME, "dataFolder", "Data folder:", default_data_folder()),
-        (GF.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
-        (GF.PF_TEXT, "paletteID", "Palette ID:", "color"),
-        (GF.PF_TEXT, "name", "Name:", "Card Assembler Palette"),
+        (gimpfu.PF_DIRNAME, "dataFolder", "Data folder:", os.path.expanduser('~')),
+        (gimpfu.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
+        (gimpfu.PF_TEXT, "paletteID", "Palette ID:", "color"),
+        (gimpfu.PF_TEXT, "name", "Name:", "Card Assembler Palette"),
     ],
     [],  # (results).
     palette_creator,  # Matches to name of function being defined (function).
     menu="<Image>/Card Assembler"  # Menu item location.
 )
 
-GF.register(
-    "MB_card_assembler",  # Name registered in Procedure Browser (blurb).
-    # Widget title (proc_name).
-    "Creates board-game cards.\n\nGimp plug-in folder:\n<user>/AppData/Roaming/GIMP/<version>/plug-ins/",
-    "Creates board-game cards",  # Help.
+gimpfu.register(
+    "CA_card_assembler",  # Name registered in Procedure Browser (blurb).
+    "Create board-game cards.",  # Widget title (proc_name).
+    "Create board-game cards.",  # Help.
     "Martin Brajer",  # Author.
     "Martin Brajer",  # Copyright holder.
     "April 2020",  # Date.
     "Card Assembler",  # Menu Entry (label).
     "",  # Image Type - no image required (imagetypes).
     [  # (params).
-        (GF.PF_DIRNAME, "dataFolder", "Data folder:", default_data_folder()),
-        (GF.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
-        (GF.PF_TEXT, "cardIDs", "Card IDs:", ""),
-        (GF.PF_BOOL, "save", "Save:", False),
+        (gimpfu.PF_DIRNAME, "dataFolder", "Data folder:", os.path.expanduser('~')),
+        (gimpfu.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
+        (gimpfu.PF_TEXT, "cardIDs", "Card IDs:", ""),
+        (gimpfu.PF_BOOL, "save", "Save:", False),
     ],
     [],  # (results).
     card_creator,  # Matches to name of function being defined (function).
     menu="<Image>/Card Assembler"  # Menu item location.
 )
 
-GF.main()
-
-# ---MAIN---
-if __name__ == "__main__":
-    main()
+gimpfu.main()

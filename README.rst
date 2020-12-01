@@ -8,11 +8,10 @@ creation.
 Features
 --------
 
--  Gimp tools: single-colour layer, textbox, import layers from given
-   \*.xcf file etc.
--  Load card layout information from an xml file blueprint.
--  Command chaining, making templates possible.
--  Export colors used in blueprint to Gimp palette.
+* Gimp tools: single-colour layer, textbox, import layers from given \*.xcf file etc.
+* Load card layout information from an xml file blueprint.
+* Command chaining, making templates possible.
+* Export colors used in blueprint to Gimp palette.
 
 Installation
 ============
@@ -44,24 +43,23 @@ this plug-in functions:
 Card Assembler parameters
 -------------------------
 
--  Data Folder - supplemental script and data files location. See
+* Data Folder - supplemental script and data files location. See
    `Installation > Data folder <README.md#data-folder>`__ for details.
--  XML file - name of the blueprint (\*.xml) you want to use. Must be
+* XML file - name of the blueprint (\*.xml) you want to use. Must be
    located in ``Data folder``.
--  CardIDs - path to the starting node within the blueprint.
--  Omit root node. Branches are separated by space.
--  Write each CardID entry on a separate line.
--  See `examples <README.md#examples>`__ for details.
--  Save - if so, the image will be saved to ``Saved images/`` subfolder
+* CardIDs - path to the starting node within the blueprint.
+* Omit root node. Branches are separated by space.
+* Write each CardID entry on a separate line.
+* See `examples <README.md#examples>`__ for details.
+* Save - if so, the image will be saved to ``Saved images/`` subfolder
    to data folder as ``<image name>.xcf``.
 
 Palette creator parameters
 --------------------------
 
--  Data Folder, XML file - same as above.
--  PaletteID - path to colors starting node (assuming there is special
-   color subtree).
--  Name - new palette name.
+* Data Folder, XML file - same as above.
+* PaletteID - path to colors starting node (assuming there is special color subtree).
+* Name - new palette name.
 
 Creating Blueprint.xml
 ======================
@@ -96,53 +94,51 @@ For example: ``<position parse="tuple">100, 125</position>``.
 Command types
 -------------
 
--  image
--  size (tuple)
--  name (string)
--  monochrome
--  size (tuple)
--  color (string) - hex code
--  *name (string) = "Monochrome"*
--  *position (tuple) = (0, 0)*
--  *addToPosition (int) = 0* - ``-1`` adds to just defined group
--  import\_layer\_load
--  filename (string)
--  name (string)
--  import\_layer
--  targetFile (string) - use ``name`` filled in import\_layer\_load
--  targetLayer (string)
--  *name (string) = targetLayer*
--  *position (tuple) = (0, 0)*
--  *addToPosition (int) = 0*
--  group
--  *name (string) = "Group"*
--  *addToPosition (int) = 0*
--  text
--  text (string)
--  font (string)
--  fontSize (int)
--  *fontScale (float) = 1*
--  *name (string) = "Text Layer"*
--  *color (string) = "#000000"*
--  *size (tuple) = autosize*
--  *lineSpacing (float) = 0*
--  *letterSpacing (float) = 0*
--  *justification (int) = 0* - left: ``0``, right: ``1``, center: ``2``,
-   fill: ``3``
--  *position (tuple) = (0, 0)*
--  *addToPosition (int) = 0*
--  select
--  *mode(string) = "select"* - possible values: ``select``,
-   ``deselect``, any other
--  *left(float) = 0* - dimensions in percentage of image size
--  *right(float) = 100*
--  *top(float) = 0*
--  *bottom(float) = 100*
--  mask
--  layer(string)
--  *<``select`` commands>*
--  hide
--  *no parameters*
+* image
+   * size (tuple)
+   * name (string)
+* monochrome
+   * size (tuple)
+   * color (string) - hex code
+   * *name (string) = "Monochrome"*
+   * *position (tuple) = (0, 0)*
+   * *addToPosition (int) = 0* - ``-1`` adds to just defined group
+* import\_layer\_load
+   * filename (string)
+   * name (string)
+* import\_layer
+   * targetFile (string) - use ``name`` filled in import\_layer\_load
+   * targetLayer (string)
+   * *name (string) = targetLayer*
+   * *position (tuple) = (0, 0)*
+   * *addToPosition (int) = 0*
+* group
+   * *name (string) = "Group"*
+   * *addToPosition (int) = 0*
+* text
+   * text (string)
+   * font (string)
+   * fontSize (int)
+   * *fontScale (float) = 1*
+   * *name (string) = "Text Layer"*
+   * *color (string) = "#000000"*
+   * *size (tuple) = autosize*
+   * *lineSpacing (float) = 0*
+   * *letterSpacing (float) = 0*
+   * *justification (int) = 0* - left: ``0``, right: ``1``, center: ``2``, fill: ``3``
+   * *position (tuple) = (0, 0)*
+   * *addToPosition (int) = 0*
+* select
+   * *mode(string) = "select"* - possible values: ``select``, ``deselect``, any other
+   * *left(float) = 0* - dimensions in percentage of image size
+   * *right(float) = 100*
+   * *top(float) = 0*
+   * *bottom(float) = 100*
+* mask
+   * layer(string)
+   * *<``select`` commands>*
+* hide
+   * *no parameters*
 
 Additionally, **all commands** can use ```next``
 tag <README.md#nesting>`__.
