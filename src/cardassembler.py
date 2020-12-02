@@ -40,7 +40,7 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
     """
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
-
+    
     toolbox = Toolbox(dataFolder, xmlFile)
     for cardID in cardIDs.split('\n'):
         toolbox.create_image(cardID)
@@ -65,7 +65,7 @@ def palette_creator(dataFolder, xmlFile, paletteID, name):
     """    
     if not paletteID:
         raise ValueError('No palette ID inserted!')
-
+    
     toolbox = Toolbox(dataFolder, xmlFile)
     toolbox.create_palette(paletteID, name)
 
@@ -87,16 +87,19 @@ class Toolbox():
     """
 
     def __init__(self, dataFolder, xmlFile):
-        self.dataFolder = dataFolder + '/'
+        self.dataFolder = dataFolder + '\\'
         self.blueprint = blueprint.Blueprint(self.dataFolder + xmlFile)
 
         self.gimpImage = None
         self.gimpImageImported = {}  # dict{ name: <Gimp image object> }
 
-        #: Directory used in :meth:`save_image`. Relative to :attr:`dataFolder` directory.
+        #: Directory used in :meth:`save_image`. Relative to
+        # :attr:`dataFolder` directory.
+        #: 
+        #: Defaults to "Saved images".
         self.saveDirectory = 'Saved images/'
 
-        # Specifies how a layer type is interpreted. Type: :class:`dict` { name: function }
+        # Specifies how a layer type is interpreted.
         self.addLayer = {
             'image': self._layer_image,
             'monochrome': self._layer_monochrome,
@@ -382,7 +385,7 @@ class Toolbox():
         pass
 
     def save_image(self):
-        """ Save the image as **image.name**.xcf into 'Saved images' subfolder. """
+        """ Save the image as **image.name**.xcf into :attr:`saveDirectory` subfolder. """
         directory = self.dataFolder + self.saveDirectory
         if not os.path.exists(directory):
             os.makedirs(directory)

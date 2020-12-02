@@ -2,8 +2,8 @@
 """
 Supplemental script which handles data manipulation.
 
-Introduces :class:`Blueprint` class which can read `xml` files and
-produce layout list, which is used by the main script :mod:`cardassembler`.
+Read an *xml* files and produce a layout list, which is then used
+by the main script :mod:`cardassembler`.
 """
 # ---IMPORTS---
 import xml.etree.ElementTree as ET
@@ -14,8 +14,7 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-    import os.path
-    blueprint = Blueprint('D:\Programming\Python\Gimp\cardassembler_data\Blueprint.xml')
+    blueprint = Blueprint(input('Blueprint path: '))
     layout = blueprint.generate_layout("unique item example")
     palette = blueprint.generate_palette("color")
     pass
@@ -38,101 +37,103 @@ class Blueprint():
         self.data = self._load_data(filePath)
 
     def _load_data(self, filePath):
-        """ Load blueprint (xml file) into dictionary tree.
+        """ Load blueprint (xml file) into a dictionary tree.
 
         :param filePath: Path to the \*.xml file to load
         :type filePath: str
-        :return: Tree structure of card data
+        :return: Tree structure of a card data
         :rtype: dict
         """        
         root = ET.parse(filePath).getroot()
         return self._xml2dict(root)
 
     def _xml2dict(self, parent):
-        """ Recursive translation from ElementTree to dictionary tree.
+        """
+        
+        Recursive translation from ElementTree to :class:`dict` tree from
+        the given node down.
 
-        :param parent: [description]
-        :type parent: [type]
-        :return: [description]
-        :rtype: [type]
+        :param parent: A node of ElementTree
+        :type parent: ElementTree.Element
+        :return: Dictionary representation of the given tree
+        :rtype: dict
         """        
         newDict = {}
         for child in parent:
             key = child.tag
             text = child.text
-
-            # If there is no text (just another child) tail
-            # is still there ("         \n").
-            # Second: "item.text" == None <=> "<item></item>".
-            if (text is not None) and (text.strip().replace("\n", "")):
+            
+            # First condition: "item.text" is None <=> "<item></item>".
+            # Second condition: is there actual information? Symbols other
+            # than space and newline. If there is no text (just another
+            # child), tail is still there (e.g. "         \n").
+            if (text is not None) and (text.strip().replace('\n', '')):
                 # ElementTree unescapes newline so we're reverting back.
                 text = text.replace('\\n', '\n')
-                if key in newDict:
-                    text = newDict[key] + ', ' + text
-                if child.attrib:
-                    if 'parse' in child.attrib:
-                        text = self._parse(text, child.attrib['parse'])
-
-                newDict[key] = text
-
+                if child.attrib and 'parse' in child.attrib:
+                    text = self._parse(text, child.attrib['parse'])
+                
+                newDict[key] = newDict[key] + ', ' + text if key in newDict else text
+                
             # Go down the level.
             else:
                 newDict[key] = self._xml2dict(child)
 
         return newDict
 
-    def _parse(self, text, method):
+    def _parse(self, text, targetType):
         """ ElementTree.element.text to various python types.
 
-        :param text: [description]
-        :type text: [type]
-        :param method: [description]
-        :type method: [type]
-        :raises KeyError: [description]
-        :return: [description]
-        :rtype: [type]
+        Input parsed as tuple can have any length. Its elements will be
+        parsed as :class:`int`
+
+        :param text: Text to be parsed
+        :type text: str
+        :param targetType: Either "int", "float" or "tuple"
+        :type targetType: str
+        :raises ValueError: If target type is not known
+        :return: Parsed value
+        :rtype: int or float or tuple
         """        
-        if method == 'int':
+        if targetType == 'int':
             return int(text)
 
-        elif method == 'float':
+        elif targetType == 'float':
             return float(text)
 
-        elif method == 'tuple':
-            new = []
-            for txt in text.split(', '):
-                new.append(self._parse(txt, 'int'))
-            return tuple(new)
+        elif targetType == 'tuple':
+            return tuple(self._parse(item, 'int') for item in text.split(', '))
 
-        raise KeyError('Method "{}" not found!'.format(method))
+        raise ValueError('Unknown "{0}" target type!'.format(targetType))
 
     def generate_layout(self, startBy):
         """ Generate card layout given starting position.
 
         Starting position children are sorted alphabetically (name them accordingly).
 
-        :param startBy: Path through data tree, space separated
+        :param startBy: Space separated path through data tree
+        leading to the starting node
         :type startBy: str
-        :return: Tree structure of chosen card data
+        :return: Layout of the chosen card
         :rtype: dict
         """        
         return self._stepIn({}, startBy)
 
     def _stepIn(self, layout, thisStep):
-        """ Browse data guided by 'next' tag.
+        """ Browse data guided by the 'next' tag.
 
-        Does not overwrite (first in stays).
+        Do not overwrite (first in stays).
 
-        :param layout: [description]
-        :type layout: [type]
-        :param thisStep: [description]
-        :type thisStep: [type]
-        :return: [description]
-        :rtype: [type]
+        :param layout: Input layout
+        :type layout: dict
+        :param thisStep: Where does this step leads
+        :type thisStep: str
+        :return: Filled layout
+        :rtype: dict
         """        
         nextSteps = []
         for key, value in self._nextDataset(thisStep).items():
-            # Next is not written into layout.
+            # Next is not written into layout. It stores further direction.
             if key == 'next':
                 for nextStep in value.split(', '):
                     nextSteps.append(nextStep)
@@ -141,7 +142,7 @@ class Blueprint():
             elif isinstance(value, dict):
                 if key not in layout:
                     layout[key] = {}
-                self._stepIn(layout[key], thisStep + ' ' + key)
+                layout[key] = self._stepIn(layout[key], thisStep + ' ' + key)
 
             # Keys having values from previous levels are NOT changed.
             elif key not in layout:
@@ -149,7 +150,7 @@ class Blueprint():
 
         # Recursively browse all "next"-branches.
         while nextSteps:
-            self._stepIn(layout, nextSteps.pop())
+            layout = self._stepIn(layout, nextSteps.pop())
 
         return layout
 
