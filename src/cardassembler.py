@@ -7,8 +7,8 @@ is here. The rest can be found in :mod:`blueprint` module.
 Written for Gimp 2.10.18 which uses
 `Python 2.7.18 <https://docs.python.org/release/2.7.18/>`_.
 
-Gimp runs this script through :func:`eval()` function inside its
-installation folder and direct import from different folder raises
+Probably: Gimp runs this script through :func:`eval()` function inside
+its installation folder and direct import from different folder raises
 *access denied* error.
 """
 
@@ -47,6 +47,10 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
         toolbox.create_image(cardID)
         if save:
             toolbox.save_image()
+    
+    if os.path.exists(os.path.dirname(__file__) + '\\keepCmdOpen'):
+        raw_input('\nPress Enter to close this window!')
+
 
 
 def palette_creator(dataFolder, xmlFile, paletteID, name):
@@ -91,6 +95,7 @@ class Toolbox():
     def __init__(self, dataFolder, xmlFile):
         self.dataFolder = dataFolder + '\\'
         self.blueprint = blueprint.Blueprint(self.dataFolder + xmlFile)
+        print('Blueprint loaded.')
 
         self.gimpImage = None
         self.gimpImageImported = {}  # dict{ name: <Gimp image object> }
