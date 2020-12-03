@@ -10,7 +10,7 @@ Welcome to Card Assembler's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   readmeLink
+   overview
    creatingBlueprint
    layerTypes
    modules/modules
