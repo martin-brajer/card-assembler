@@ -111,8 +111,7 @@ class Blueprint():
 
         Starting position children are sorted alphabetically (name them accordingly).
 
-        :param startBy: Space separated path through data tree
-        leading to the starting node
+        :param startBy: Space separated path through data tree leading to the starting node
         :type startBy: str
         :return: Layout of the chosen card
         :rtype: dict

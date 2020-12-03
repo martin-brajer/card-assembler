@@ -14,6 +14,7 @@
         "bysource",
         "cardassembler",
         "genindex",
+        "guilabel",
         "maxdepth",
         "modindex",
         "recommonmark",

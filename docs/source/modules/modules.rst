@@ -4,5 +4,5 @@ Library
 .. toctree::
    :maxdepth: 4
 
-   cardassembler
+   cardAssembler
    blueprint

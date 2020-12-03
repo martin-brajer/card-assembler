@@ -1,6 +1,6 @@
 Layer types
 ===========
-**Parameters here show tags of xml blueprint for given layer types.**
+**Parameters here show tags of xml blueprint relevant for given layer types.**
 
 .. method:: image()
    
