@@ -416,7 +416,7 @@ class Toolbox():
 
 gimpfu.register(
     "CA_palette_assembler",  # Name registered in Procedure Browser (blurb).
-    "Create palette.",  # Widget title (proc_name).
+    "Create palette." + " " * 50,  # Widget title (proc_name).
     "Create palette.",  # Help.
     "Martin Brajer",  # Author.
     "Martin Brajer",  # Copyright holder.
@@ -436,7 +436,7 @@ gimpfu.register(
 
 gimpfu.register(
     "CA_card_assembler",  # Name registered in Procedure Browser (blurb).
-    "Create board-game cards.",  # Widget title (proc_name).
+    "Create board-game cards." + " " * 40,  # Widget title (proc_name).
     "Create board-game cards.",  # Help.
     "Martin Brajer",  # Author.
     "Martin Brajer",  # Copyright holder.
