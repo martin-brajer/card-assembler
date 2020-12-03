@@ -40,6 +40,7 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
     """
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
+    dataFolder = dataFolder.decode("utf-8")
     
     toolbox = Toolbox(dataFolder, xmlFile)
     for cardID in cardIDs.split('\n'):
@@ -65,6 +66,7 @@ def palette_creator(dataFolder, xmlFile, paletteID, name):
     """    
     if not paletteID:
         raise ValueError('No palette ID inserted!')
+    dataFolder = dataFolder.decode("utf-8")
     
     toolbox = Toolbox(dataFolder, xmlFile)
     toolbox.create_palette(paletteID, name)
