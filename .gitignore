@@ -1,7 +1,6 @@
 # My files.
 TODO.txt
-copytogimp.bat
-index.html.Ink
+docs/index.html.lnk
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -75,6 +74,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/build/
 
 # PyBuilder
 target/

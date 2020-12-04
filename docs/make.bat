@@ -1,13 +1,14 @@
 @ECHO OFF
-pushd %~dp0
+PUSHD %~dp0
 
-@REM set SPHINXBUILD=sphinx-build
-@REM set SOURCEDIR=source
-@REM set BUILDDIR=build/html
-@REM %SPHINXBUILD% -b html -d build/doctrees %SOURCEDIR% %BUILDDIR%
+SET SPHINXBUILD=sphinx-build
+SET BUILDER=html
+SET BUILDPATH=build/doctrees
+SET SOURCEDIR=source
+SET OUTPUTDIR=build/html
 
+%SPHINXBUILD% -b %BUILDER% -d %BUILDPATH% %SOURCEDIR% %OUTPUTDIR%
+@REM sphinx-build -b html -d build/doctrees source build/html
 
-sphinx-build -b html -d build/doctrees source build/html
-popd
-
-cmd /k
+POPD
+CMD /k
