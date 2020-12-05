@@ -12,6 +12,7 @@ Welcome to Card Assembler's documentation!
 
    overview
    creatingBlueprint
+   examples
    layerTypes
    modules/modules
 

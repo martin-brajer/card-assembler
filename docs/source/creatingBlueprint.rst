@@ -23,7 +23,7 @@ Parsing
 -------
 
 If a parameter type is not *string*, add attribute ``parse`` to the
-parameter's tag with value ``int``, ``float`` or ``tuple`` as needed.
+parameter's tag with value ``int`` ``float`` or ``tuple`` as needed.
 
 For example: ``<position parse="tuple">100, 125</position>``.
 
@@ -78,30 +78,3 @@ Command types
 
 Additionally, **all commands** can use ```next``
 tag `<README.md#nesting>`__.
-
-Examples
-========
-
-There are two example blueprints in
-```cardassembler_data`` `<../../tree/master/CardAssembler_Data>`__
-folder. One shows very simple blueprint to start with. The second one
-shows intended use.
-
-Simple
-------
-
-``Blueprint_Example_Simple.xml`` shows very simple blueprint to make
-sense of how this plug-in works.
-
-The only card there can be created by filling ``example`` into CardIDs
-field.
-
-Full
-----
-
-``Blueprint_Example_Full.xml`` shows intended usage including structure
-to make adding more similar items easier and clearer.
-
-The only card there can be created by filling ``unique spell example``
-into CardIDs field. Colors can be exported by filling ``color`` into
-`PaletteID field <README.md#palette-creator-parameters>`__.

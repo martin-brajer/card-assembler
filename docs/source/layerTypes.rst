@@ -1,6 +1,9 @@
 Layer types
 ===========
-**Parameters here show tags of xml blueprint relevant for given layer types.**
+
+Parameters here show tags of xml blueprint relevant for given layer types.
+
+Additionally, all commands can use ``next`` tag. See `creatingBlueprints`.
 
 .. method:: image()
    
