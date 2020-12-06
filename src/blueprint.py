@@ -102,7 +102,8 @@ class Blueprint():
             return float(text)
 
         elif targetType == 'tuple':
-            return tuple(self._parse(item, 'int') for item in text.split(', '))
+            return tuple(self._parse(item, 'int') for item in
+                text.replace(' ', '').split(','))
 
         raise ValueError('Unknown "{0}" target type!'.format(targetType))
 
