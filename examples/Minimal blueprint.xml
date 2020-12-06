@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE data>
+<!-- spell-checker: disable -->
+
+<!-- CardID: "example". -->
+
+<data>
+    <example>
+        <command01_image>
+            <layerType>image</layerType>
+            <size parse="tuple">800, 500</size>
+        </command01_image>
+        <command02_background>
+            <layerType>monochrome</layerType>
+            <name>Background</name>
+            <color>#ffffff</color>
+            <size parse="tuple">800, 500</size>
+        </command02_background>
+        <command03_text>
+            <layerType>text</layerType>
+            <name>Text</name>
+            <text>Example 1</text>
+            <font>Tahoma Bold</font>
+            <fontSize parse="int">44</fontSize>
+            <justification parse="int">2</justification>
+            <position parse="tuple">100, 125</position>
+            <size parse="tuple">600, 60</size>
+        </command03_text>
+    </example>
+</data>
