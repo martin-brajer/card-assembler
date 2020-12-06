@@ -4,7 +4,7 @@ Main script which handles communication with Gimp.
 
 All code using `gimpfu <https://www.gimp.org/docs/python/index.html>`_
 is here. The rest can be found in :mod:`blueprint` module.
-Written for Gimp 2.10.18 which uses
+Written for `Gimp 2.10.18 <https://www.gimp.org/>`_ which uses
 `Python 2.7.18 <https://docs.python.org/release/2.7.18/>`_.
 
 Probably: Gimp runs this script through :func:`eval()` function inside
