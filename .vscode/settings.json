@@ -26,5 +26,8 @@
     "editor.formatOnSave": false,
     "editor.formatOnPaste": false,
     "editor.formatOnType": false,
+    "restructuredtext.sphinxBuildPath": "C:\\Python\\Scripts\\sphinx-build.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\docs\\source",
+    "restructuredtext.builtDocumentationPath": "${workspaceFolder}\\docs\\build\\html",
+    "restructuredtext.languageServer.disabled": false,
 }

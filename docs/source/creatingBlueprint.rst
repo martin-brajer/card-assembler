@@ -1,80 +1,62 @@
-Creating Blueprint.xml
-======================
+Create a blueprint
+====================
 
 Card Assembler works with tree structure. When calling the plug-in in Gimp,
-you specify the node where to start. Its children are then alphabetically
-called to formulate respective layer builders. Each layer must have
-``commandType`` tag! Accepted values are listed with details in section
-:doc:`layerTypes`
+you specify which node to start at. Its children are then alphabetically
+called to formulate respective layer builders. Each layer must include
+``commandType`` tag! Accepted values are listed in section :doc:`layerTypes`.
+
+.. _Create a blueprint Nesting:
 
 Nesting
 -------
 
-Command can contain any number of ``next`` tags. Each points to another
-node in the tree whose children are appended to the initial command.
-This tag can only add new tags, not rewrite the old ones. Intentional
-usage is inserting card specific tags first and then let ``next`` point
-to some more general version (i.e. template).
+Any node can contain any number of ``next`` tags. Each points to another
+node in the tree whose children are appended to the initial node.
+This tag can only add new tags, not rewrite the ones already in place.
+Intentional usage is inserting card specific tags first and then let
+``next`` point to some more general version (i.e. template).
 
-It is useful to create separate color dedicated subtree. See `Palette
-Creator parameters <README.md#palette-creator-parameters>`__.
+It is useful to create separate color dedicated subtree. Those can then be
+exported into Gimp as a palette.
 
 Parsing
 -------
 
-If a parameter type is not *string*, add attribute ``parse`` to the
-parameter's tag with value ``int`` ``float`` or ``tuple`` as needed.
+If a parameter :class:`type` is not :class:`str`, add attribute ``parse`` to
+the parameter's tag with value :class:`int`, :class:`float` or :class:`tuple`
+as needed. For example:
 
-For example: ``<position parse="tuple">100, 125</position>``.
+.. code:: xml
 
-Command types
--------------
+   <position parse="tuple">100, 125</position>
 
-* image
-  * size (tuple)
-  * name (string)
-* monochrome
-  * size (tuple)
-  * color (string) - hex code
-  * *name (string) = "Monochrome"*
-  * *position (tuple) = (0, 0)*
-  * *addToPosition (int) = 0* - ``-1`` adds to just defined group
-* import\_layer\_load
-  * filename (string)
-  * name (string)
-* import\_layer
-  * targetFile (string) - use ``name`` filled in import\_layer\_load
-  * targetLayer (string)
-  * *name (string) = targetLayer*
-  * *position (tuple) = (0, 0)*
-  * *addToPosition (int) = 0*
-* group
-  * *name (string) = "Group"*
-  * *addToPosition (int) = 0*
-* text
-  * text (string)
-  * font (string)
-  * fontSize (int)
-  * *fontScale (float) = 1*
-  * *name (string) = "Text Layer"*
-  * *color (string) = "#000000"*
-  * *size (tuple) = autosize*
-  * *lineSpacing (float) = 0*
-  * *letterSpacing (float) = 0*
-  * *justification (int) = 0* - left: ``0``, right: ``1``, center: ``2``, fill: ``3``
-  * *position (tuple) = (0, 0)*
-  * *addToPosition (int) = 0*
-* select
-  * *mode(string) = "select"* - possible values: ``select``, ``deselect``, any other
-  * *left(float) = 0* - dimensions in percentage of image size
-  * *right(float) = 100*
-  * *top(float) = 0*
-  * *bottom(float) = 100*
-* mask
-  * layer(string)
-  * *<``select`` commands>*
-* hide
-  * *no parameters*
+Examples
+--------
 
-Additionally, **all commands** can use ```next``
-tag `<README.md#nesting>`__.
+There are two example blueprints in `examples`_ folder. The first one provides
+a minimal blueprint to start with. The second one shows intended use.
+
+* :file:`Minimal blueprint.xml`
+
+   To assemble the this card, use "example" as **CardIDs**. There are three
+   commands in the file:
+   
+   #. Blank canvas.
+   #. White background.
+   #. Text "Example 1" in the middle.
+
+* :file:`Blueprint using a template`
+   
+   To assemble the this card, use "unique spell example" as **CardIDs**.
+   
+   The first tag (under the mentioned path) refers to the template for all
+   spell cards, where universal details (such as title position) are specified.
+   The main part continues by adding card specific details to the
+   template-defined layers. Try to follow all ``next`` tags to discover its
+   full structure.
+
+   Take notice of the last part tagged ``color``. With this definition, colors
+   can then be exported by filling "color" into **PaletteID**.
+   
+.. _examples: https://github.com/martin-brajer/card-assembler/tree/master/examples
