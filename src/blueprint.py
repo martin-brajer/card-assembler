@@ -2,7 +2,7 @@
 """
 Supplemental script which handles data manipulation.
 
-Read an *xml* file and produce a layout list, which is then used
+Read an XML file and produce a layout list, which is then used
 by the main script :mod:`cardassembler`.
 
 .. note::
@@ -26,28 +26,28 @@ def main():
 class Blueprint():
     """ Blueprint information handling class.
 
-    Can read xml file, produce layout list and palettes.
+    Can read XML file, produce layout list and palette.
 
-    :param filePath: Blueprint xml folder
+    :param filePath: Folder containing XML blueprint
     :type filePath: str
     """
     
     def __init__(self, filePath):
-        #: Tree structure (:class:`dict`) representation of an :file:`xml` file.
-        self.data = self._load_data(filePath) if filePath is not None else None
+        #: Tree structure (:class:`dict`) representation of an XML file.
+        self.data = self._load(filePath) if filePath is not None else None
 
-    def _load_data(self, filePath):
-        """ Load blueprint (xml file) into a dictionary tree.
+    def _load(self, filePath):
+        """ Load XML file blueprint into a dictionary tree.
 
-        :param filePath: Path to the :file:`{*}.xml` file to load
+        :param filePath: Path to the XML file to load
         :type filePath: str
         :return: Tree structure of cards data
         :rtype: dict
         """        
         root = ET.parse(filePath).getroot()
-        return self._xml2dict(root)
+        return self._ElementTree2dict(root)
 
-    def _xml2dict(self, parent):
+    def _ElementTree2dict(self, parent):
         """ Translation from :mod:`xml.etree.ElementTree` to :class:`dict`
         tree from the given node down (recursive).
 
@@ -75,7 +75,7 @@ class Blueprint():
                 
             # Go down the level.
             else:
-                newDict[key] = self._xml2dict(child)
+                newDict[key] = self._ElementTree2dict(child)
 
         return newDict
 
@@ -146,7 +146,7 @@ class Blueprint():
             elif key not in layout:
                 layout[key] = value
 
-        # Recursively browse all "next"-branches.
+        # Recursively browse all "next" branches.
         while nextSteps:
             layout = self._stepIn(layout, nextSteps.pop())
 
@@ -194,7 +194,7 @@ class Blueprint():
 
         Kinda inverse to :meth:`_goto`.
 
-        :param colorTree: [description]
+        :param colorTree: Part of the data (dict tree) to look for colors in
         :type colorTree: dict
         :return: List colors as :class:`tuple` of space delimited path and color code
         :rtype: list
@@ -205,7 +205,6 @@ class Blueprint():
                 subpalette = self._harvest_leaves(value)
                 for subKey, subValue in subpalette:
                     palette.append(
-                        # (key + " " + subKey if subKey else key, subValue))
                         ('{} {}'.format(key, subKey) if subKey else key, subValue))
 
             elif key in ['color', 'colour']:
@@ -242,9 +241,9 @@ class TestBlueprintMethods(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.blueprint._parse('test', 'foo')
     
-    def test_xml2dict(self):
+    def test_ElementTree2dict(self):
         """ Beginning of :file:`Minimal blueprint.xml`. """
-        self.assertEqual(self.blueprint._xml2dict(self.elementTree), self.DICT)
+        self.assertEqual(self.blueprint._ElementTree2dict(self.elementTree), self.DICT)
     
     def test_goto(self):
         self.blueprint.data = self.DICT

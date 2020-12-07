@@ -29,7 +29,7 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
     
     Registered function by ``gimpfu.register()``. Main plugin functionality.
     
-    :param dataFolder: Blueprints (*\*.xml*) and data images (*\*.xcf*) folder
+    :param dataFolder: Blueprints (XML) and data images (XCF) folder
     :type dataFolder: str
     :param xmlFile: Blueprint to be used (with extension)
     :type xmlFile: str
@@ -59,7 +59,7 @@ def palette_creator(dataFolder, xmlFile, paletteID, name):
 
     Registered function by ``gimpfu.register()``. Supplemental plugin functionality.
 
-    :param dataFolder: Blueprints (*\*.xml*) and data images (*\*.xcf*) folder
+    :param dataFolder: Blueprints (XML) folder
     :type dataFolder: str
     :param xmlFile: Blueprint to be used (with extension)
     :type xmlFile: str
@@ -87,7 +87,7 @@ class Toolbox():
     (i.e. text, icons). Then completes the image and optionally
     saves it. Probably you'll want to fine-tune the image manually.
 
-    :param dataFolder: Blueprints (*\*.xml*) and data images (*\*.xcf*) folder
+    :param dataFolder: Blueprints (XML) and data images (XCF) folder
     :type dataFolder: str
     :param xmlFile: Blueprint to be used (with extension)
     :type xmlFile: str
@@ -199,8 +199,8 @@ class Toolbox():
         """ Load new data image.
 
         The file has to be in the data folder. Filename is specified in the
-        xml file. Name parameter is used in xml file to reference the imported
-        file. That's why it's not optional parameter.
+        XML file. Name parameter is used in the XML file to reference the
+        imported file. That's why it's not an optional parameter.
 
         :param filename: See description
         :type filename: str
