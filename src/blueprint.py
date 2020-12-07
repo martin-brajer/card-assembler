@@ -13,6 +13,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 # ---CONSTANTS---
+__version__ = "1.4.0"
 
 # ---FUNCTIONS---
 def main():

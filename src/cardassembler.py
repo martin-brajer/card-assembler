@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 import blueprint  # Same folder as this script.
 
 # ---CONSTANTS---
-
+__version__ = blueprint.__version__
 
 # ---FUNCTIONS---
 def card_creator(dataFolder, xmlFile, cardIDs, save):
