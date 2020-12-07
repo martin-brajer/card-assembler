@@ -208,7 +208,7 @@ class Blueprint():
                         # (key + " " + subKey if subKey else key, subValue))
                         ('{} {}'.format(key, subKey) if subKey else key, subValue))
 
-            elif key == 'color':
+            elif key in ['color', 'colour']:
                 palette.append(("", value))
 
         return palette
