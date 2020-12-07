@@ -1,9 +1,10 @@
 Layer types
 ===========
 
-Parameters here show tags of xml blueprint relevant for given layer types.
+Parameters here show tags of an XML blueprint relevant for the given layer types.
 
-Additionally, all commands can use ``next`` tag. See :ref:`Creating blueprint > Nesting<Create a blueprint Nesting>`
+Additionally, all commands can use ``next`` tag. See
+:ref:`Creating blueprint > Nesting<Create a blueprint Nesting>`
 
 .. method:: image()
    
