@@ -6,6 +6,7 @@ Read an *xml* files and produce a layout list, which is then used
 by the main script :mod:`cardassembler`.
 """
 # ---IMPORTS---
+import unittest
 import xml.etree.ElementTree as ET
 
 # ---CONSTANTS---
@@ -14,7 +15,9 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-    blueprint = Blueprint(input('Blueprint path: '))
+    filename = raw_input('Blueprint path: ')
+    # filename = ""
+    blueprint = Blueprint(filename)
     layout = blueprint.generate_layout("unique item example")
     palette = blueprint.generate_palette("color")
     pass
@@ -34,7 +37,7 @@ class Blueprint():
     
     def __init__(self, filePath):
         #: Tree structure (:class:`dict`) of card data
-        self.data = self._load_data(filePath)
+        self.data = self._load_data(filePath) if filePath is not None else None
 
     def _load_data(self, filePath):
         """ Load blueprint (xml file) into a dictionary tree.
@@ -213,6 +216,32 @@ class Blueprint():
         return palette
 
 
+class TestBlueprintMethods(unittest.TestCase):
+
+    def setUp(self):
+        self.blueprint = Blueprint(None)
+    
+    def tearDown(self):
+        pass
+
+    def test_parse_int(self):
+        self.assertEqual(self.blueprint._parse("5", "int"), 5)
+
+    def test_parse_float(self):
+        self.assertEqual(self.blueprint._parse("1.3", "float"), 1.3)
+
+    def test_parse_tuple_spaces(self):
+        self.assertEqual(
+            self.blueprint._parse("3, 5", "tuple"),
+            self.blueprint._parse("3,5", "tuple"))
+    
+    def test_parse_unknown(self):
+        with self.assertRaises(ValueError):
+            self.blueprint._parse("test", "foo")
+    
+
 # ---MAIN---
+
 if __name__ == "__main__":
-    main()
+    unittest.main(exit=False)
+    # main()
