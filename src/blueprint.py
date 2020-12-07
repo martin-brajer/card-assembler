@@ -2,8 +2,11 @@
 """
 Supplemental script which handles data manipulation.
 
-Read an *xml* files and produce a layout list, which is then used
+Read an *xml* file and produce a layout list, which is then used
 by the main script :mod:`cardassembler`.
+
+.. note::
+    Run this script directly to run a :mod:`unittest`.
 """
 # ---IMPORTS---
 import unittest
@@ -30,28 +33,26 @@ class Blueprint():
     """
     
     def __init__(self, filePath):
-        #: Tree structure (:class:`dict`) of card data
+        #: Tree structure (:class:`dict`) representation of an :file:`xml` file.
         self.data = self._load_data(filePath) if filePath is not None else None
 
     def _load_data(self, filePath):
         """ Load blueprint (xml file) into a dictionary tree.
 
-        :param filePath: Path to the \*.xml file to load
+        :param filePath: Path to the :file:`{*}.xml` file to load
         :type filePath: str
-        :return: Tree structure of a card data
+        :return: Tree structure of cards data
         :rtype: dict
         """        
         root = ET.parse(filePath).getroot()
         return self._xml2dict(root)
 
     def _xml2dict(self, parent):
-        """
-        
-        Recursive translation from ElementTree to :class:`dict` tree from
-        the given node down.
+        """ Translation from :mod:`xml.etree.ElementTree` to :class:`dict`
+        tree from the given node down (recursive).
 
         :param parent: A node of ElementTree
-        :type parent: ElementTree.Element
+        :type parent: :class:`ElementTree.Element`
         :return: Dictionary representation of the given tree
         :rtype: dict
         """        
@@ -129,7 +130,7 @@ class Blueprint():
         :rtype: dict
         """        
         nextSteps = []
-        for key, value in self._nextDataset(thisStep).items():
+        for key, value in self._goto(thisStep).items():
             # Next is not written into layout. It stores further direction.
             if key == 'next':
                 for nextStep in value.split(', '):
@@ -151,16 +152,16 @@ class Blueprint():
 
         return layout
 
-    def _nextDataset(self, nextSteps):
+    def _goto(self, nextSteps):
         """ Find target dict tree node and return its sub tree.
 
-        Individual node turns must be separated by space.
+        Analogous to successive application of :meth:`dict.get`.
 
-        :param nextSteps: [description]
-        :type nextSteps: [type]
-        :raises KeyError: [description]
-        :return: [description]
-        :rtype: [type]
+        :param nextSteps: Space separated key sequence.
+        :type nextSteps: str
+        :raises KeyError: If one of the given keys doesn't exist.
+        :return: Sub-tree of the :data:`self.data` dict tree.
+        :rtype: dict
         """        
         data = self.data
         # Down the rabbit hole!
@@ -178,31 +179,34 @@ class Blueprint():
 
         To be used in another mini plug-in to import palette into Gimp.
 
-        :param startBy: Path through data tree, space separated
+        :param startBy: Path through the data tree (space separated)
         :type startBy: str
         :return: Pairs of name and color
         :rtype: list
         """        
-        palette = self._harvest_leaves(self._nextDataset(startBy))
-        palette.sort()
+        palette = self._harvest_leaves(self._goto(startBy))
+        palette.sort()  # Alphabetically first.
         palette.sort(key=lambda x: x[0].count(' '))
         return palette
 
-    def _harvest_leaves(self, colorDict):
-        """ Harvest leaves.
+    def _harvest_leaves(self, colorTree):
+        """ Find the path to the leaves of the given tree, whose tag is ``color``.
 
-        :param colorDict: [description]
-        :type colorDict: [type]
-        :return: [description]
-        :rtype: [type]
+        Kinda inverse to :meth:`_goto`.
+
+        :param colorTree: [description]
+        :type colorTree: dict
+        :return: List colors as :class:`tuple` of space delimited path and color code
+        :rtype: list
         """        
         palette = []
-        for key, value in colorDict.items():
+        for key, value in colorTree.items():
             if isinstance(value, dict):
                 subpalette = self._harvest_leaves(value)
                 for subKey, subValue in subpalette:
                     palette.append(
-                        (key + (" " if subKey else "") + subKey, subValue))
+                        # (key + " " + subKey if subKey else key, subValue))
+                        ('{} {}'.format(key, subKey) if subKey else key, subValue))
 
             elif key == 'color':
                 palette.append(("", value))
@@ -242,10 +246,10 @@ class TestBlueprintMethods(unittest.TestCase):
         """ Beginning of :file:`Minimal blueprint.xml`. """
         self.assertEqual(self.blueprint._xml2dict(self.elementTree), self.DICT)
     
-    def test_nextDataset(self):
+    def test_goto(self):
         self.blueprint.data = self.DICT
         self.assertEqual(
-            self.blueprint._nextDataset('card command01_image'),
+            self.blueprint._goto('card command01_image'),
             self.DICT['card']['command01_image'])
     
 
