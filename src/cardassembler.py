@@ -9,7 +9,8 @@ Written for `Gimp 2.10.18 <https://www.gimp.org/>`_ which uses
 
 Probably: Gimp runs this script through :func:`eval()` function inside
 its installation folder and direct import from different folder raises
-*access denied* error.
+*access denied* error. See :meth:`_run_code` function in 
+:file:`{Gimp}/lib/python2.7/runpy.py`.
 """
 
 # ---IMPORTS---
