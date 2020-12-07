@@ -12,20 +12,14 @@ import xml.etree.ElementTree as ET
 # ---CONSTANTS---
 
 # ---FUNCTIONS---
-
-
 def main():
-    filename = raw_input('Blueprint path: ')
-    # filename = ""
-    blueprint = Blueprint(filename)
+    blueprint = Blueprint("")
     layout = blueprint.generate_layout("unique item example")
     palette = blueprint.generate_palette("color")
     pass
 
 
 # ---CLASSES---
-
-
 class Blueprint():
     """ Blueprint information handling class.
 
@@ -123,7 +117,7 @@ class Blueprint():
         return self._stepIn({}, startBy)
 
     def _stepIn(self, layout, thisStep):
-        """ Browse data guided by the 'next' tag.
+        """ Browse data guided by the ``next`` tag.
 
         Do not overwrite (first in stays).
 
@@ -158,7 +152,7 @@ class Blueprint():
         return layout
 
     def _nextDataset(self, nextSteps):
-        """ Browse ElementTree based on argument indicator.
+        """ Find target dict tree node and return its sub tree.
 
         Individual node turns must be separated by space.
 
@@ -220,28 +214,42 @@ class TestBlueprintMethods(unittest.TestCase):
 
     def setUp(self):
         self.blueprint = Blueprint(None)
+        self.DICT = {'card': {'command01_image': {'layerType': 'image', 'size': (800, 500)}}}
+        
+        self.elementTree = ET.fromstring(
+            '<data><card><command01_image><layerType>image</layerType><size parse="tuple">800, 500</size></command01_image></card></data>')
+        # print(ET.tostring(self.elementTree).decode())
     
     def tearDown(self):
         pass
 
     def test_parse_int(self):
-        self.assertEqual(self.blueprint._parse("5", "int"), 5)
+        self.assertEqual(self.blueprint._parse('5', 'int'), 5)
 
     def test_parse_float(self):
-        self.assertEqual(self.blueprint._parse("1.3", "float"), 1.3)
+        self.assertEqual(self.blueprint._parse('1.3', 'float'), 1.3)
 
     def test_parse_tuple_spaces(self):
         self.assertEqual(
-            self.blueprint._parse("3, 5", "tuple"),
-            self.blueprint._parse("3,5", "tuple"))
+            self.blueprint._parse('3, 5', 'tuple'),
+            self.blueprint._parse('3,5', 'tuple'))
     
     def test_parse_unknown(self):
         with self.assertRaises(ValueError):
-            self.blueprint._parse("test", "foo")
+            self.blueprint._parse('test', 'foo')
+    
+    def test_xml2dict(self):
+        """ Beginning of :file:`Minimal blueprint.xml`. """
+        self.assertEqual(self.blueprint._xml2dict(self.elementTree), self.DICT)
+    
+    def test_nextDataset(self):
+        self.blueprint.data = self.DICT
+        self.assertEqual(
+            self.blueprint._nextDataset('card command01_image'),
+            self.DICT['card']['command01_image'])
     
 
 # ---MAIN---
-
 if __name__ == "__main__":
     unittest.main(exit=False)
     # main()
