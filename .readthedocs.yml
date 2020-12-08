@@ -19,6 +19,6 @@ formats:
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: 3.6 # In fact 2.7 required by Gimp, but readthedocs does no tallow it.
+  version: 3.6 # In fact 2.7 required by Gimp, but readthedocs does not allow it.
   install:
     - requirements: docs/requirements.txt
