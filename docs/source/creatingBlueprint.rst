@@ -56,7 +56,7 @@ a minimal blueprint to start with. The second one shows intended use.
    template-defined layers. Try to follow all ``next`` tags to discover its
    full structure.
 
-   Take notice of the last part tagged ``color``. With this definition, colors
-   can then be exported by filling "color" into **PaletteID**.
+   Take notice of the last part tagged ``color``. Using this definition, colors
+   can be exported by filling "color" into **PaletteID**.
    
 .. _examples: https://github.com/martin-brajer/card-assembler/tree/master/examples
