@@ -10,6 +10,8 @@ creation.
 
 This way to see the [documentation](https://card-assembler.readthedocs.io/en/latest/).
 
+Versioning follows [Semantic Versioning 2.0.0](https://semver.org/).
+
 # Features
 
 * Gimp tools: single-colour layer, textbox, import layers from a given

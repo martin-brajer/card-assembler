@@ -5,9 +5,12 @@ Supplemental script which handles data manipulation.
 Read an XML file and produce a layout list, which is then used
 by the main script :mod:`cardassembler`.
 
+Special variable :data:`__version__` is defined here.
+
 .. note::
     Run this script directly to run a :mod:`unittest`.
 """
+#: Versioning follows `Semantic Versioning 2.0.0 <https://semver.org/>`_.
 __version__ = '1.4.0'
 
 import unittest
