@@ -11,7 +11,7 @@ This way to see the full [documentation](https://card-assembler.readthedocs.io/e
 # Features
 
 * Gimp tools: single-colour layer, textbox, import layers from a given
-  `\*.xcf` file etc.
+  `*.xcf` file etc.
 * Load card layout information from an xml file blueprint.
 * Command chaining, making templates possible.
 * Export colors used in blueprint to Gimp palette.

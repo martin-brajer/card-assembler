@@ -2,22 +2,22 @@ Card Assembler overview
 =======================
 
 Card Assembler is a free and open-source plug-in for Gimp. Assembles an
-image according to an xml file blueprint. Meant for board game card
+image according to an XML file blueprint. Meant for board game card
 creation.
 
 Features
 --------
 
-* Gimp tools: single-colour layer, textbox, import layers from a given .xcf
+* Gimp tools: single-colour layer, textbox, import layers from a given XCF
   file etc.
-* Load card layout information from an xml file blueprint.
+* Load card layout information from an XML file blueprint.
 * Command chaining, making templates possible.
 * Export colors used in blueprint to Gimp as a palette.
 
 Installation
 ------------
 
-Copy all :file:`*.py` files from :file:`src/` into :file:`card-assembler/`
+Copy all PY files from :file:`src/` into :file:`card-assembler/`
 in your Gimp plug-in folder:
 :file:`{user}/AppData/Roaming/GIMP/{version}/plug-ins/`. Then **restart Gimp**.
 
@@ -29,7 +29,7 @@ There is a new item in the menu bar - :guilabel:`Card Assembler` containing:
 1. :guilabel:`Card Assembler`: Create board-game cards.
 
    * :guilabel:`Data Folder`: Data files location. Mainly the following xml file.
-   * :guilabel:`XML file`: Name of the blueprint (:file:`*.xml`) you want to use.
+   * :guilabel:`XML file`: Name of the blueprint (XML) you want to use.
    * :guilabel:`CardIDs`: Path to the starting node within the blueprint.
 
      * Omit the root node. Steps are separated by spaces.
@@ -40,7 +40,7 @@ There is a new item in the menu bar - :guilabel:`Card Assembler` containing:
 
 2. :guilabel:`Palette creator`: Export colors used in a blueprint to Gimp palette.
 
-   * :guilabel:`Data Folder`, Same as above.
+   * :guilabel:`Data Folder`, :guilabel:`XML file`: Same as above.
    * :guilabel:`PaletteID`: Path to the colors starting node (assuming there is
      a special color subtree).
    * :guilabel:`Name`: The new palette's name.

@@ -17,6 +17,7 @@ its installation folder and direct import from different folder raises
 import gimpfu
 import sys
 import os
+
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 import blueprint  # Same folder as this script.
 
