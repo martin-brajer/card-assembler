@@ -17,6 +17,7 @@ import sys
 # Get rid of filename > source folder > docs folder, then append src.
 sys.path.insert(0, os.path.join(os.path.abspath(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'src'))
+from blueprint import __version__ as blueprintVersion
 
 # -- Project information -----------------------------------------------------
 
@@ -25,7 +26,7 @@ copyright = '2020, Martin Brajer'
 author = 'Martin Brajer'
 
 # The full version, including alpha/beta/rc tags
-release = '1.3'
+release = blueprintVersion
 
 
 # -- General configuration ---------------------------------------------------
