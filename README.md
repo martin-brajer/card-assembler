@@ -1,5 +1,7 @@
 # Card Assembler
 
+[![Releases](https://img.shields.io/github/v/release/martin-brajer/card-assembler)](https://github.com/martin-brajer/card-assembler/releases)
+[![GitHub](https://img.shields.io/github/license/martin-brajer/card-assembler)](https://github.com/martin-brajer/card-assembler/blob/master/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/card-assembler/badge/?version=latest)](https://card-assembler.readthedocs.io/en/latest/?badge=latest)
 
 Card Assembler is a free and open-source plug-in for Gimp. Assembles an
