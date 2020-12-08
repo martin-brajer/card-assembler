@@ -8,14 +8,12 @@ by the main script :mod:`cardassembler`.
 .. note::
     Run this script directly to run a :mod:`unittest`.
 """
-# ---IMPORTS---
+__version__ = '1.4.0'
+
 import unittest
 import xml.etree.ElementTree as ET
 
-# ---CONSTANTS---
-__version__ = "1.4.0"
 
-# ---FUNCTIONS---
 def main():
     blueprint = Blueprint("")
     layout = blueprint.generate_layout("unique item example")
@@ -23,14 +21,13 @@ def main():
     pass
 
 
-# ---CLASSES---
 class Blueprint():
     """ Blueprint information handling class.
 
     Can read XML file, produce layout list and palette.
 
     :param filePath: Folder containing XML blueprint
-    :type filePath: str
+    :type filePath: str or None
     """
     
     def __init__(self, filePath):
@@ -214,17 +211,28 @@ class Blueprint():
         return palette
 
 
-class TestBlueprintMethods(unittest.TestCase):
+class TestBlueprintModule(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.blueprint = Blueprint(None)
-        cls.DICT = {'card': {'command01_image': {'layerType': 'image', 'size': (800, 500)}}}
         
-        cls.elementTree = ET.fromstring(
-            '<data><card><command01_image><layerType>image</layerType><size parse="tuple">800, 500</size></command01_image></card></data>')
-        # print(ET.tostring(self.elementTree).decode())
+        cls.blueprint = Blueprint(None)
+        #: Beginning of example :file:`Minimal blueprint.xml`.
+        XML = '<data><card><command01_image><layerType>image</layerType><size parse="tuple">800, 500</size></command01_image></card></data>'
+        cls.elementTree = ET.fromstring(XML)
+        #: Dict representation of :data:`XML`.
+        cls.DICT = {'card': {'command01_image':
+            {'layerType': 'image', 'size': (800, 500)}}}
     
+    def test_version(self):
+        """ Test whether :data:`__version__` follows `Semantic Versioning 2.0.0
+        <https://semver.org/>`_.
+        """
+        import re
+        #: FAQ: Is there a suggested regular expression (RegEx) to check a SemVer string?
+        pattern = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
+        self.assertTrue(re.search(pattern, __version__))
+
     def test_parse_int(self):
         self.assertEqual(self.blueprint._parse('5', 'int'), 5)
 
@@ -241,7 +249,6 @@ class TestBlueprintMethods(unittest.TestCase):
             self.blueprint._parse('test', 'foo')
     
     def test_ElementTree2dict(self):
-        """ Beginning of :file:`Minimal blueprint.xml`. """
         self.assertEqual(self.blueprint._ElementTree2dict(self.elementTree), self.DICT)
     
     def test_goto(self):
@@ -251,7 +258,6 @@ class TestBlueprintMethods(unittest.TestCase):
             self.DICT['card']['command01_image'])
     
 
-# ---MAIN---
 if __name__ == "__main__":
     unittest.main(exit=False)
     # main()

@@ -5,4 +5,4 @@ blueprint module
    :members:
    :private-members:
    :undoc-members:
-   :exclude-members: TestBlueprintMethods, main
+   :exclude-members: main
