@@ -216,22 +216,20 @@ class Blueprint():
 
 class TestBlueprintMethods(unittest.TestCase):
 
-    def setUp(self):
-        self.blueprint = Blueprint(None)
-        self.DICT = {'card': {'command01_image': {'layerType': 'image', 'size': (800, 500)}}}
+    @classmethod
+    def setUpClass(cls):
+        cls.blueprint = Blueprint(None)
+        cls.DICT = {'card': {'command01_image': {'layerType': 'image', 'size': (800, 500)}}}
         
-        self.elementTree = ET.fromstring(
+        cls.elementTree = ET.fromstring(
             '<data><card><command01_image><layerType>image</layerType><size parse="tuple">800, 500</size></command01_image></card></data>')
         # print(ET.tostring(self.elementTree).decode())
     
-    def tearDown(self):
-        pass
-
     def test_parse_int(self):
         self.assertEqual(self.blueprint._parse('5', 'int'), 5)
 
     def test_parse_float(self):
-        self.assertEqual(self.blueprint._parse('1.3', 'float'), 1.3)
+        self.assertAlmostEqual(self.blueprint._parse('1.3', 'float'), 1.3)
 
     def test_parse_tuple_spaces(self):
         self.assertEqual(
