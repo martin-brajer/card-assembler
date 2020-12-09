@@ -9,8 +9,8 @@ Written for `Gimp 2.10.18 <https://www.gimp.org/>`_ which uses
 
 Probably: Gimp runs this script through :func:`eval()` function inside
 its installation folder and direct import from different folder raises
-*access denied* error. See :meth:`_run_code` function in 
-:file:`{Gimp}/lib/python2.7/runpy.py`.
+*access denied error*. See :meth:`_run_code` function in 
+:file:`{Gimp installation folder}/lib/python2.7/runpy.py`.
 """
 
 # ---IMPORTS---
@@ -29,6 +29,7 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
     """ Create board-game cards.
     
     Registered function by ``gimpfu.register()``. Main plugin functionality.
+    Add "keepCmdOpen" among **cardIDs** to keep the cmd window open.
     
     :param dataFolder: Blueprints (XML) and data images (XCF) folder
     :type dataFolder: str
@@ -43,14 +44,18 @@ def card_creator(dataFolder, xmlFile, cardIDs, save):
     if not cardIDs:
         raise ValueError('No card IDs inserted!')
     dataFolder = dataFolder.decode("utf-8")
-    
+    keepCmdOpen = False
+
     toolbox = Toolbox(dataFolder, xmlFile)
     for cardID in cardIDs.split('\n'):
+        if cardID == 'keepCmdOpen':
+            keepCmdOpen = True
+            continue
         toolbox.create_image(cardID)
         if save:
             toolbox.save_image()
     
-    if os.path.exists(os.path.dirname(__file__) + '\\keepCmdOpen'):
+    if keepCmdOpen:
         raw_input('\nPress Enter to close this window!')
 
 

@@ -46,6 +46,7 @@ There is a new item in the menu bar - :guilabel:`Card Assembler` containing:
 
      * Omit the root node. Steps are separated by spaces.
      * Write each CardID entry on a separate line.
+     * Add "keepCmdOpen" as one of the IDs to keep Gimp's cmd open.
 
    * :guilabel:`Save`: Save the image into a data folder subfolder as
      :file:`{image name}.xcf`.
@@ -56,9 +57,6 @@ There is a new item in the menu bar - :guilabel:`Card Assembler` containing:
    * :guilabel:`PaletteID`: Path to the colors starting node (assuming there is
      a special color subtree).
    * :guilabel:`Name`: The new palette's name.
-
-To keep Gimp's cmd open after the task is done, add **keepCmdOpen** file to the
-plug-in folder.
 
 License
 -------
