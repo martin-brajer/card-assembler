@@ -154,13 +154,13 @@ class Toolbox():
             if layerType not in self.addLayer:
                 raise ValueError('Unknown layer type "{0}" in "{1}"'.format(layerType, layerName))
 
-            self.addLayer[layerType](layer)
+            self.addLayer[layerType](**layer)
             print('Layer "{0}" of type "{1}" done.'.format(layerName, layerType))
 
         display = gimpfu.pdb.gimp_display_new(self.image)
         print('-' * 20)
 
-    def _layer_image(self, layer):
+    def _layer_image(self, size, name='Card Assembler Image', **kwargs):
         """ Create new image. Needed for layer creation.
 
         :param size: Image dimensions in pixels
@@ -168,13 +168,12 @@ class Toolbox():
         :param name: Image name, defaults to "Card Assembler Image"
         :type name: str
         """
-        self.image = gimpfu.pdb.gimp_image_new(
-            layer['size'][0], layer['size'][1], gimpfu.RGB)
-        gimpfu.pdb.gimp_image_set_filename(
-            self.image, layer.get('name', 'Card Assembler Image'))
-
-    def _layer_monochrome(self, layer):
-        """ Single colour filled layer.
+        self.image = gimpfu.pdb.gimp_image_new(size[0], size[1], gimpfu.RGB)
+        gimpfu.pdb.gimp_image_set_filename(self.image, name)
+    
+    def _layer_monochrome(self, size, color, name='Monochrome', position=(0, 0),
+            addToPosition=0, **kwargs):
+        """ Single color filled layer.
 
         :param size: Layer dimensions in pixels
         :type size: tuple
@@ -193,18 +192,17 @@ class Toolbox():
 
         newLayer = gimpfu.pdb.gimp_layer_new(
             self.image,
-            layer['size'][0], layer['size'][1],
+            size[0], size[1],
             gimpfu.RGB,
-            layer.get('name', 'Monochrome'),
+            name,
             100,
             gimpfu.LAYER_MODE_NORMAL)
-        self.image.add_layer(newLayer, layer.get('addToPosition', 0))
-        if 'position' in layer:
-            gimpfu.pdb.gimp_layer_set_offsets(newLayer, *layer['position'])
-        gimpfu.pdb.gimp_context_set_foreground(layer['color'])
+        self.image.add_layer(newLayer, addToPosition)
+        gimpfu.pdb.gimp_layer_set_offsets(newLayer, *position)
+        gimpfu.pdb.gimp_context_set_foreground(color)
         gimpfu.pdb.gimp_drawable_edit_bucket_fill(newLayer, 0, 0, 0)
 
-    def _layer_import_layer_load(self, layer):
+    def _layer_import_layer_load(self, filename, name, **kwargs):
         """ Load new data image.
 
         The file has to be in the data folder. Filename is specified in the
@@ -218,11 +216,12 @@ class Toolbox():
         
         :raises RuntimeError: If there is no image
         """
-        filepath = self.dataFolder + layer['filename']
-        self.gimpImageImported[layer['name']] = gimpfu.pdb.gimp_file_load(
+        filepath = self.dataFolder + filename
+        self.gimpImageImported[name] = gimpfu.pdb.gimp_file_load(
             filepath, filepath)
 
-    def _layer_import_layer(self, layer):
+    def _layer_import_layer(self, targetFile, targetLayer, addToPosition=0,
+            name=None, position=(0, 0), **kwargs):
         """ Copy layer from a data image.
 
         :param targetFile: Use **name** filled in ``import_layer_load``
@@ -232,24 +231,24 @@ class Toolbox():
         :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
         :type addToPosition: int, optional
         :param name: Layer name, defaults to **targetLayer**
-        :type name: str, optional
+        :type name: str or None, optional
         :param position: Defaults to (0, 0)
         :type position: tuple, optional
         :raises RuntimeError: If there is no image
         """
         if self.image is None:
             raise RuntimeError('Image to add the layer to not found.')
+        if name is None:
+            name = targetLayer
 
         oldLayer = gimpfu.pdb.gimp_image_get_layer_by_name(
-            self.gimpImageImported[layer['targetFile']], layer['targetLayer'])
-        newLayer = gimpfu.pdb.gimp_layer_new_from_drawable(
-            oldLayer, self.image)
-        self.image.add_layer(newLayer, layer.get('addToPosition', 0))
-        newLayer.name = layer.get('name', layer['targetLayer'])
-        gimpfu.pdb.gimp_layer_set_offsets(
-            newLayer, *layer.get('position', (0, 0)))
+            self.gimpImageImported[targetFile], targetLayer)
+        newLayer = gimpfu.pdb.gimp_layer_new_from_drawable(oldLayer, self.image)
+        self.image.add_layer(newLayer, addToPosition)
+        newLayer.name = name
+        gimpfu.pdb.gimp_layer_set_offsets(newLayer, *position)
 
-    def _layer_group(self, layer):
+    def _layer_group(self, addToPosition=0, name='Group', **kwargs):
         """ Create new layer group.
 
         To fill next layers in, set theirs **addToPosition** parameter to -1.
@@ -264,14 +263,16 @@ class Toolbox():
             raise RuntimeError('Image to add the layer to not found.')
 
         layerGroup = gimpfu.pdb.gimp_layer_group_new(self.image)
-        self.image.add_layer(layerGroup, layer.get('addToPosition', 0))
-        layerGroup.name = layer.get('name', 'Group')
+        self.image.add_layer(layerGroup, addToPosition)
+        layerGroup.name = name
 
-    def _layer_text(self, layer):
+    def _layer_text(self, text, font, fontSize, fontScale=1, addToPosition=0,
+            name=None, color='#000000', size=None, lineSpacing=0,
+            letterSpacing=0, justification=0, position=(0, 0), **kwargs):
         """ Text layer.
 
         :param text: Text
-        :type size: str
+        :type text: str
         :param font: Font name
         :type font: str
         :param fontSize: Font size
@@ -280,12 +281,12 @@ class Toolbox():
         :type fontScale: float, optional
         :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
         :type addToPosition: int, optional
-        :param name: Layer name, defaults to "Text Layer" (Gimp default)
-        :type name: str, optional
+        :param name: Layer name, defaults to None (Gimp default)
+        :type name: str or None, optional
         :param color: Text color in hex code, defaults to “#000000” (black)
         :type color: str, optional
-        :param size: Layer dimensions in pixels, defaults to *autosize*
-        :type size: tuple
+        :param size: Layer dimensions in pixels, defaults to None (autosize)
+        :type size: tuple or None
         :param lineSpacing: Line separation change, defaults to 0
         :type lineSpacing: float, optional
         :param letterSpacing: Letters separation change, defaults to 0
@@ -299,30 +300,24 @@ class Toolbox():
         if self.image is None:
             raise RuntimeError('Image to add the layer to not found.')
 
-        fontsize = layer['fontSize'] * layer.get('textScale', 1)
+        fontsize = fontSize * fontScale
         textLayer = gimpfu.pdb.gimp_text_layer_new(
             self.image,
-            layer['text'],
-            layer['font'],
+            text,
+            font,
             fontsize, 0)
-        self.image.add_layer(textLayer, layer.get('addToPosition', 0))
-        if 'name' in layer:
-            textLayer.name = layer['name']
-        gimpfu.pdb.gimp_text_layer_set_color(
-            textLayer, layer.get('color', '#000000'))
-        if 'size' in layer:
-            gimpfu.pdb.gimp_text_layer_resize(
-                textLayer, *layer['size'])
-        gimpfu.pdb.gimp_text_layer_set_line_spacing(
-            textLayer, layer.get('lineSpacing', 0))
-        gimpfu.pdb.gimp_text_layer_set_letter_spacing(
-            textLayer, layer.get('letterSpacing', 0))
-        gimpfu.pdb.gimp_text_layer_set_justification(
-            textLayer, layer.get('justification', 0))
-        gimpfu.pdb.gimp_layer_set_offsets(
-            textLayer, *layer.get('position', (0, 0)))
+        self.image.add_layer(textLayer, addToPosition)
+        if name is not None:
+            textLayer.name = name
+        gimpfu.pdb.gimp_text_layer_set_color(textLayer, color)
+        if size is not None:
+            gimpfu.pdb.gimp_text_layer_resize(textLayer, *size)
+        gimpfu.pdb.gimp_text_layer_set_line_spacing(textLayer, lineSpacing)
+        gimpfu.pdb.gimp_text_layer_set_letter_spacing(textLayer, letterSpacing)
+        gimpfu.pdb.gimp_text_layer_set_justification(textLayer, justification)
+        gimpfu.pdb.gimp_layer_set_offsets(textLayer, *position)
 
-    def _layer_select(self, layer):
+    def _layer_select(self, mode='select', left=0, right=100, top=0, bottom=100, **kwargs):
         """ New selection by percentage of image size.
 
         :param mode: Either "select" or "deselect", defaults to the former one
@@ -343,17 +338,12 @@ class Toolbox():
         if self.image is None:
             raise RuntimeError('Image to add the layer to not found.')
 
-        mode = layer.get('mode', 'select')
         if mode == 'select':
-            x = round(gimpfu.pdb.gimp_image_width(self.image)
-                      * layer.get('left', 0) / 100)
-            y = round(gimpfu.pdb.gimp_image_height(self.image)
-                      * layer.get('top', 0) / 100)
+            x = round(gimpfu.pdb.gimp_image_width(self.image) * left / 100)
+            y = round(gimpfu.pdb.gimp_image_height(self.image) * top / 100)
 
-            width = round(gimpfu.pdb.gimp_image_width(self.image)
-                          * layer.get('right', 100) / 100) - x
-            height = round(gimpfu.pdb.gimp_image_height(self.image)
-                           * layer.get('bottom', 100) / 100) - y
+            width = round(gimpfu.pdb.gimp_image_width(self.image) * right / 100) - x
+            height = round(gimpfu.pdb.gimp_image_height(self.image) * bottom / 100) - y
 
             if width <= 0:
                 raise ArithmeticError(
@@ -373,28 +363,26 @@ class Toolbox():
         else:
             raise ValueError('Select: unknown mode.')
 
-    def _layer_mask(self, layer):
+    def _layer_mask(self, targetLayer, **kwargs):
         """ Mask layer.
 
         Create mask for given layer from given selection.
 
-        :param layer: Target layer to select from
-        :type layer: str
+        :param targetLayer: Target layer to select from
+        :type targetLayer: str
         :param parameters: Other parameters to be passed to ``select``
         :type parameters: ``select``
         """
-        self._layer_select(layer)
+        self._layer_select(kwargs)
 
-        newLayer = gimpfu.pdb.gimp_image_get_layer_by_name(
-            self.image, layer['targetLayer'])
-        mask = gimpfu.pdb.gimp_layer_create_mask(
-            newLayer, 4)  # GIMP_ADD_SELECTION_MASK
+        newLayer = gimpfu.pdb.gimp_image_get_layer_by_name(self.image, targetLayer)
+        mask = gimpfu.pdb.gimp_layer_create_mask(newLayer, 4)  # GIMP_ADD_SELECTION_MASK
         gimpfu.pdb.gimp_layer_add_mask(newLayer, mask)
 
-        layer['mode'] = 'deselect'
-        self._layer_select(layer)
+        kwargs['mode'] = 'deselect'
+        self._layer_select(kwargs)
 
-    def _layer_hide(self, layer):
+    def _layer_hide(self, **kwargs):
         """ Ignore command.
 
         Meant for overrides, i.e. hiding a predefined (template) layer.
