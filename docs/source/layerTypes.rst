@@ -17,7 +17,7 @@ Additionally, all commands can use ``next`` tag. See
 
 .. method:: monochrome()
    
-   Single colour filled layer.
+   Single color filled layer.
 
    :param size: Layer dimensions in pixels
    :type size: tuple
