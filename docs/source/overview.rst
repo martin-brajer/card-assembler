@@ -20,7 +20,7 @@ blueprint. Meant for board game card creation.
 Features
 --------
 
-* Gimp tools: single-colour layer, textbox, import layers from a given XCF
+* Gimp tools: single-color layer, textbox, import layers from a given XCF
   file etc.
 * Load card layout information from an XML file blueprint.
 * Command chaining, making templates possible.
