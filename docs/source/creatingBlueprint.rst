@@ -46,7 +46,7 @@ a minimal blueprint to start with. The second one shows intended use.
    #. White background.
    #. Text "Example 1" in the middle.
 
-* :file:`Blueprint using a template`
+* :file:`Blueprint using a template.xml` + :file:`Data image.xcf`
    
    To assemble the this card, use "unique spell example" as **CardIDs**.
    
