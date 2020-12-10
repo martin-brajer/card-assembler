@@ -320,7 +320,7 @@ class Toolbox():
     def _layer_select(self, mode='select', left=0, right=100, top=0, bottom=100, **kwargs):
         """ New selection by percentage of image size.
 
-        :param mode: Either "select" or "deselect", defaults to the former one
+        :param mode: Either "select", "selectInvert", or "deselect", defaults to "select"
         :type mode: str
         :param left: Left edge position in percentage of the image size, defaults to 0
         :type left: float, optional
@@ -338,7 +338,7 @@ class Toolbox():
         if self.image is None:
             raise RuntimeError('Image to add the layer to not found.')
 
-        if mode == 'select':
+        if mode == 'select' or mode == 'selectInvert':
             x = round(gimpfu.pdb.gimp_image_width(self.image) * left / 100)
             y = round(gimpfu.pdb.gimp_image_height(self.image) * top / 100)
 
@@ -356,31 +356,35 @@ class Toolbox():
                 self.image,
                 0,  # GIMP_CHANNEL_OP_ADD
                 x, y, width, height)
+            
+            # Be aware of possible interference with _layer_mask() deselect part.
+            if mode == 'selectInvert':
+                gimpfu.pdb.gimp_selection_invert(self.image)
         
         elif mode == 'deselect':
             gimpfu.pdb.gimp_selection_none(self.image)
 
         else:
-            raise ValueError('Select: unknown mode.')
+            raise ValueError('Select: unknown mode: "{}".'.format(mode))
 
     def _layer_mask(self, targetLayer, **kwargs):
         """ Mask layer.
 
         Create mask for given layer from given selection.
 
-        :param targetLayer: Target layer to select from
+        :param targetLayer: Target layer to be masked
         :type targetLayer: str
-        :param parameters: Other parameters to be passed to ``select``
-        :type parameters: ``select``
+        :param kwargs: Additional named arguments are passed to ``select``
+        :type kwargs: various, optional
         """
-        self._layer_select(kwargs)
+        self._layer_select(**kwargs)
 
         newLayer = gimpfu.pdb.gimp_image_get_layer_by_name(self.image, targetLayer)
         mask = gimpfu.pdb.gimp_layer_create_mask(newLayer, 4)  # GIMP_ADD_SELECTION_MASK
         gimpfu.pdb.gimp_layer_add_mask(newLayer, mask)
 
         kwargs['mode'] = 'deselect'
-        self._layer_select(kwargs)
+        self._layer_select(**kwargs)
 
     def _layer_hide(self, **kwargs):
         """ Ignore command.
