@@ -22,14 +22,13 @@
         "toctree",
         "undoc"
     ],
-    "python.autoComplete.extraPaths": ["C:\\Program Files\\GIMP 2\\lib\\gimp\\2.0\\python"],
-    
+    "python.autoComplete.extraPaths": [
+        "C:\\Program Files\\GIMP 2\\lib\\gimp\\2.0\\python"
+    ],
     "codemap.maxNestingLevel": 3,
-    
     "editor.formatOnSave": false,
     "editor.formatOnPaste": false,
     "editor.formatOnType": false,
-    
     "autoDocstring.docstringFormat": "sphinx",
     "restructuredtext.sphinxBuildPath": "C:\\Python\\Scripts\\sphinx-build.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\docs\\source",

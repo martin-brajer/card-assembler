@@ -7,21 +7,21 @@
 <data>
     <example>
         <command01_image>
-            <layerType>image</layerType>
+            <layer_type>image</layer_type>
             <size parse="tuple">800, 500</size>
         </command01_image>
         <command02_background>
-            <layerType>monochrome</layerType>
+            <layer_type>monochrome</layer_type>
             <name>Background</name>
             <color>#ffffff</color>
             <size parse="tuple">800, 500</size>
         </command02_background>
         <command03_text>
-            <layerType>text</layerType>
+            <layer_type>text</layer_type>
             <name>Text</name>
             <text>Example 1</text>
             <font>Tahoma Bold</font>
-            <fontSize parse="int">44</fontSize>
+            <font_size parse="int">44</font_size>
             <justification parse="int">2</justification>
             <position parse="tuple">100, 125</position>
             <size parse="tuple">600, 60</size>
