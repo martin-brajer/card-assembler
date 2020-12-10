@@ -103,6 +103,7 @@ class Toolbox():
         self.dataFolder = dataFolder + '\\'
         self.blueprint = blueprint.Blueprint(self.dataFolder + xmlFile)
         print('Blueprint loaded.')
+        print('-' * 20)
 
         self.gimpImage = None
         self.gimpImageImported = {}  # dict{ name: <Gimp image object> }
@@ -139,7 +140,8 @@ class Toolbox():
         """        
         if self.blueprint is None:
             raise RuntimeError('Blueprint must be initialized first!')
-
+        
+        print('Assembling "{}"'.format(cardID))
         layout = self.blueprint.generate_layout(cardID)
         for layerName in sorted(layout.keys()):
             layer = layout[layerName]
@@ -156,6 +158,7 @@ class Toolbox():
             print('Layer "{0}" of type "{1}" done.'.format(layerName, layerType))
 
         display = gimpfu.pdb.gimp_display_new(self.image)
+        print('-' * 20)
 
     def _layer_image(self, layer):
         """ Create new image. Needed for layer creation.
