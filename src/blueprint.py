@@ -5,22 +5,26 @@ Supplemental script which handles data manipulation.
 Read an XML file and produce a layout list, which is then used
 by the main script :mod:`cardassembler`.
 
-Special variable :data:`__version__` is defined here.
-
 .. note::
     Run this script directly to run a :mod:`unittest`.
 """
-#: Versioning follows `Semantic Versioning 2.0.0 <https://semver.org/>`_.
+
+
+__all__ = ['Blueprint']
 __version__ = '1.4.0'
+__author__ = 'Martin Brajer'
+
 
 import unittest
+
 import xml.etree.ElementTree as ET
 
 
 def main():
-    blueprint = Blueprint("")
-    layout = blueprint.generate_layout("unique item example")
-    palette = blueprint.generate_palette("color")
+    path = 'D:\DokumentyM\Hry\Proroctví\Cards\Data'
+    blueprint = Blueprint((path + '\\Blueprint.xml').decode('utf-8'))
+    layout = blueprint.generate_layout('unique item example')
+    palette = blueprint.generate_palette('color')
     pass
 
 
@@ -29,58 +33,59 @@ class Blueprint():
 
     Can read XML file, produce layout list and palette.
 
-    :param filePath: Folder containing XML blueprint
-    :type filePath: str or None
+    :param file_path: Folder containing XML blueprint
+    :type file_path: str or None
     """
-    
-    def __init__(self, filePath):
-        #: Tree structure (:class:`dict`) representation of an XML file.
-        self.data = self._load(filePath) if filePath is not None else None
 
-    def _load(self, filePath):
+    def __init__(self, file_path):
+        # Dict tree representation of the given XML file.
+        self.data = self._load(file_path) if file_path is not None else None
+
+    def _load(self, file_path):
         """ Load XML file blueprint into a dictionary tree.
 
-        :param filePath: Path to the XML file to load
-        :type filePath: str
+        :param file_path: Path to the XML file to load
+        :type file_path: str
         :return: Tree structure of cards data
         :rtype: dict
-        """        
-        root = ET.parse(filePath).getroot()
-        return self._ElementTree2dict(root)
+        """
+        root = ET.parse(file_path).getroot()
+        return self._ElementTree_to_dict(root)
 
-    def _ElementTree2dict(self, parent):
-        """ Translation from :mod:`xml.etree.ElementTree` to :class:`dict`
-        tree from the given node down (recursive).
+    def _ElementTree_to_dict(self, parent):
+        """ Translation from :mod:`xml.etree.ElementTree` to
+        :class:`dict` tree from the given node down (recursive).
 
         :param parent: A node of ElementTree
         :type parent: :class:`ElementTree.Element`
         :return: Dictionary representation of the given tree
         :rtype: dict
-        """        
-        newDict = {}
+        """
+        new_dict = {}
         for child in parent:
             key = child.tag
             text = child.text
-            
             # First condition: "item.text" is None <=> "<item></item>".
-            # Second condition: is there actual information? Symbols other
-            # than space and newline. If there is no text (just another
-            # child), tail is still there (e.g. "         \n").
+            # Second condition: is there actual information? Symbols
+            # other than space and newline. If there is no text (just
+            # another child), tail is still there (e.g. "         \n").
             if (text is not None) and (text.strip().replace('\n', '')):
                 # ElementTree unescapes newline so we're reverting back.
                 text = text.replace('\\n', '\n')
                 if child.attrib and 'parse' in child.attrib:
                     text = self._parse(text, child.attrib['parse'])
+
+                if key in new_dict:
+                    new_dict[key] = ', '.join((new_dict[key], text))
+                else:
+                    new_dict[key] = text
                 
-                newDict[key] = newDict[key] + ', ' + text if key in newDict else text
-                
-            # Go down the level.
+            # No text, go down the level.
             else:
-                newDict[key] = self._ElementTree2dict(child)
+                new_dict[key] = self._ElementTree_to_dict(child)
+        return new_dict
 
-        return newDict
-
-    def _parse(self, text, targetType):
+    def _parse(self, text, target_type):
         """ ElementTree.element.text to various python types.
 
         Input parsed as tuple can have any length. Its elements will be
@@ -88,129 +93,131 @@ class Blueprint():
 
         :param text: Text to be parsed
         :type text: str
-        :param targetType: Either "int", "float" or "tuple"
-        :type targetType: str
+        :param target_type: Either "int", "float" or "tuple"
+        :type target_type: str
         :raises ValueError: If target type is not known
         :return: Parsed value
         :rtype: int or float or tuple
-        """        
-        if targetType == 'int':
+        """
+        if target_type == 'int':
             return int(text)
 
-        elif targetType == 'float':
+        elif target_type == 'float':
             return float(text)
 
-        elif targetType == 'tuple':
+        elif target_type == 'tuple':
             return tuple(self._parse(item, 'int') for item in
-                text.replace(' ', '').split(','))
+                            text.replace(' ', '').split(','))
 
-        raise ValueError('Unknown "{0}" target type!'.format(targetType))
+        raise ValueError('Unknown "{}" target type!'.format(target_type))
 
-    def generate_layout(self, startBy):
+    def generate_layout(self, start_by):
         """ Generate card layout given starting position.
 
-        Starting position children are sorted alphabetically (name them accordingly).
+        Starting position children are sorted alphabetically (name them
+        accordingly).
 
-        :param startBy: Space separated path through data tree leading to the starting node
-        :type startBy: str
+        :param start_by: Space separated path through data tree leading
+            to the starting node
+        :type start_by: str
         :return: Layout of the chosen card
         :rtype: dict
-        """        
-        return self._stepIn({}, startBy)
+        """
+        return self._step_in({}, start_by)
 
-    def _stepIn(self, layout, thisStep):
+    def _step_in(self, layout, this_step):
         """ Browse data guided by the ``next`` tag.
 
         Do not overwrite (first in stays).
 
         :param layout: Input layout
         :type layout: dict
-        :param thisStep: Where does this step leads
-        :type thisStep: str
+        :param this_step: Where does this step leads
+        :type this_step: str
         :return: Filled layout
         :rtype: dict
-        """        
-        nextSteps = []
-        for key, value in self._goto(thisStep).items():
+        """
+        next_steps = []
+        for key, value in self._goto(this_step).items():
             # Next is not written into layout. It stores further direction.
             if key == 'next':
-                for nextStep in value.split(', '):
-                    nextSteps.append(nextStep)
-
+                for next_step in value.split(', '):
+                    next_steps.append(next_step)
             # If lower levels can be reached.
             elif isinstance(value, dict):
                 if key not in layout:
                     layout[key] = {}
-                layout[key] = self._stepIn(layout[key], thisStep + ' ' + key)
-
+                layout[key] = self._step_in(
+                    layout[key], ' '.join((this_step, key)))
             # Keys having values from previous levels are NOT changed.
             elif key not in layout:
                 layout[key] = value
 
         # Recursively browse all "next" branches.
-        while nextSteps:
-            layout = self._stepIn(layout, nextSteps.pop())
-
+        while next_steps:
+            layout = self._step_in(layout, next_steps.pop())
         return layout
 
-    def _goto(self, nextSteps):
+    def _goto(self, next_steps):
         """ Find target dict tree node and return its sub tree.
 
         Analogous to successive application of :meth:`dict.get`.
 
-        :param nextSteps: Space separated key sequence.
-        :type nextSteps: str
+        :param next_steps: Space separated key sequence.
+        :type next_steps: str
         :raises KeyError: If one of the given keys doesn't exist.
         :return: Sub-tree of the :data:`self.data` dict tree.
         :rtype: dict
-        """        
+        """
         data = self.data
         # Down the rabbit hole!
-        for nextStep in nextSteps.split(' '):
-            if nextStep in data:
-                data = data[nextStep]
+        for next_step in next_steps.split(' '):
+            if next_step in data:
+                data = data[next_step]
             else:
                 raise KeyError(
-                    'While browsing the data tree by "{}", keyword "{}" was not found.'.format(
-                        nextSteps, nextStep))
+                    'While browsing the data tree by "{}", keyword "{}"'
+                    'was not found.'.format(next_steps, next_step))
         return data
 
-    def generate_palette(self, startBy):
+    def generate_palette(self, start_by):
         """ Make palette out of colors used by cards.
 
         To be used in another mini plug-in to import palette into Gimp.
 
-        :param startBy: Path through the data tree (space separated)
-        :type startBy: str
+        :param start_by: Path through the data tree (space separated)
+        :type start_by: str
         :return: Pairs of name and color
         :rtype: list
-        """        
-        palette = self._harvest_leaves(self._goto(startBy))
+        """
+        palette = self._harvest_leaves(self._goto(start_by))
         palette.sort()  # Alphabetically first.
         palette.sort(key=lambda x: x[0].count(' '))
         return palette
 
-    def _harvest_leaves(self, colorTree):
-        """ Find the path to the leaves of the given tree, whose tag is ``color``.
+    def _harvest_leaves(self, color_tree):
+        """ Find the path to the leaves of the given tree, whose tag
+        is ``color``.
 
         Kinda inverse to :meth:`_goto`.
 
-        :param colorTree: Part of the data (dict tree) to look for colors in
-        :type colorTree: dict
-        :return: List colors as :class:`tuple` of space delimited path and color code
+        :param color_tree: Part of the data (dict tree) to look for
+            colors in
+        :type color_tree: dict
+        :return: List colors as :class:`tuple` of space delimited
+            path and color code
         :rtype: list
-        """        
+        """
         palette = []
-        for key, value in colorTree.items():
+        for key, value in color_tree.items():
             if isinstance(value, dict):
                 subpalette = self._harvest_leaves(value)
                 for subKey, subValue in subpalette:
                     palette.append(
-                        ('{} {}'.format(key, subKey) if subKey else key, subValue))
+                        (' '.join((key, subKey)) if subKey else key, subValue))
 
             elif key == 'color':
-                palette.append(("", value))
-
+                palette.append(('', value))
         return palette
 
 
@@ -218,22 +225,33 @@ class TestBlueprintModule(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        
+
         cls.blueprint = Blueprint(None)
         #: Beginning of example :file:`Minimal blueprint.xml`.
-        XML = '<data><card><command01_image><layerType>image</layerType><size parse="tuple">800, 500</size></command01_image></card></data>'
-        cls.elementTree = ET.fromstring(XML)
+        XML = (
+            '<data><card><command01_image><layerType>image</layerType>'
+            '<size parse="tuple">800, 500</size></command01_image>'
+            '</card></data>'
+            )
+        cls.element_tree = ET.fromstring(XML)
         #: Dict representation of :data:`XML`.
         cls.DICT = {'card': {'command01_image':
             {'layerType': 'image', 'size': (800, 500)}}}
-    
+
     def test_version(self):
-        """ Test whether :data:`__version__` follows `Semantic Versioning 2.0.0
-        <https://semver.org/>`_.
+        """ Test whether :data:`__version__` follows
+        `Semantic Versioning 2.0.0 <https://semver.org/>`_.
         """
         import re
-        #: FAQ: Is there a suggested regular expression (RegEx) to check a SemVer string?
-        pattern = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
+        #: FAQ: Is there a suggested regular expression (RegEx) to
+        # check a SemVer string?
+        pattern = (
+            '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0'
+            '|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-'
+            '9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*'
+            '))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)'
+            '*))?$'
+            )
         self.assertTrue(re.search(pattern, __version__))
 
     def test_parse_int(self):
@@ -246,21 +264,22 @@ class TestBlueprintModule(unittest.TestCase):
         self.assertEqual(
             self.blueprint._parse('3, 5', 'tuple'),
             self.blueprint._parse('3,5', 'tuple'))
-    
+
     def test_parse_unknown(self):
         with self.assertRaises(ValueError):
             self.blueprint._parse('test', 'foo')
-    
-    def test_ElementTree2dict(self):
-        self.assertEqual(self.blueprint._ElementTree2dict(self.elementTree), self.DICT)
-    
+
+    def test_ElementTree_to_dict(self):
+        self.assertEqual(self.blueprint._ElementTree_to_dict(
+            self.element_tree), self.DICT)
+
     def test_goto(self):
         self.blueprint.data = self.DICT
         self.assertEqual(
             self.blueprint._goto('card command01_image'),
             self.DICT['card']['command01_image'])
-    
 
-if __name__ == "__main__":
-    unittest.main(exit=False)
-    # main()
+
+if __name__ == '__main__':
+    # unittest.main(exit=False)
+    main()

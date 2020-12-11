@@ -15,8 +15,9 @@ its installation folder and direct import from different folder raises
 
 
 __all__ = []
-__version__ = None  # Needs :class:`blueprint`. See below.
-__author__ = 'Martin Brajer'
+# Needs :class:`blueprint`. See below.
+__version__ = None
+__author__ = None
 
 
 import os
@@ -29,6 +30,7 @@ import blueprint  # Same folder as this script.
 
 
 __version__ = blueprint.__version__
+__author__ = blueprint.__author__
 
 
 def card_creator(data_folder, xml_file, card_IDs, save):
@@ -38,19 +40,19 @@ def card_creator(data_folder, xml_file, card_IDs, save):
     functionality. Add "keepCmdOpen" among **cardIDs** to keep
     the cmd window open.
 
-    :param dataFolder: Blueprints (XML) and data images (XCF) folder
-    :type dataFolder: str
-    :param xmlFile: Blueprint to be used (with extension)
-    :type xmlFile: str
-    :param cardIDs: Newline-separated paths to starting nodes.
-    :type cardIDs: str
+    :param data_folder: Blueprints (XML) and data images (XCF) folder
+    :type data_folder: str
+    :param xml_file: Blueprint to be used (with extension)
+    :type xml_file: str
+    :param card_IDs: Newline-separated paths to starting nodes.
+    :type card_IDs: str
     :param save: Save the images after generation
     :type save: bool
     :raises ValueError: If cardIDs are empty.
     """
     if not card_IDs:
         raise ValueError('No card IDs inserted!')
-    data_folder = data_folder.decode("utf-8")
+    data_folder = data_folder.decode('utf-8')
     keep_cmd_open = False
 
     toolbox = Toolbox(data_folder, xml_file)
@@ -71,19 +73,19 @@ def palette_creator(data_folder, xml_file, palette_ID, name):
     Registered function by ``gimpfu.register()``. Supplemental
     plugin functionality.
 
-    :param dataFolder: Blueprints (XML) folder
-    :type dataFolder: str
-    :param xmlFile: Blueprint to be used (with extension)
-    :type xmlFile: str
-    :param paletteID: Path to the starting node.
-    :type paletteID: str
+    :param data_folder: Blueprints (XML) folder
+    :type data_folder: str
+    :param xml_file: Blueprint to be used (with extension)
+    :type xml_file: str
+    :param palette_ID: Path to the starting node.
+    :type palette_ID: str
     :param name: Name of the created palette
     :type name: str
     :raises ValueError: If the paletteID is empty.
     """
     if not palette_ID:
         raise ValueError('No palette ID inserted!')
-    data_folder = data_folder.decode("utf-8")
+    data_folder = data_folder.decode('utf-8')
 
     toolbox = Toolbox(data_folder, xml_file)
     toolbox.create_palette(palette_ID, name)
@@ -96,10 +98,10 @@ class Toolbox():
     (i.e. text, icons). Then completes the image and optionally
     saves it. Probably you'll want to fine-tune the image manually.
 
-    :param dataFolder: Blueprints (XML) and data images (XCF) folder
-    :type dataFolder: str
-    :param xmlFile: Blueprint to be used (with extension)
-    :type xmlFile: str
+    :param data_folder: Blueprints (XML) and data images (XCF) folder
+    :type data_folder: str
+    :param xml_file: Blueprint to be used (with extension)
+    :type xml_file: str
     """
 
     def __init__(self, data_folder, xml_file):
@@ -128,8 +130,8 @@ class Toolbox():
         Layout consists of commands which are called alphabetically by
         name.
 
-        :param cardID: Path to the starting node.
-        :type cardID: str
+        :param card_ID: Path to the starting node.
+        :type card_ID: str
         :raises RuntimeError: If there is no blueprint
         :raises KeyError: If any of the layers has no type
         :raises ValueError: If any of the layers has unknown type
@@ -149,9 +151,8 @@ class Toolbox():
 
             layer_type = layer[LAYER_TYPE]
             if layer_type not in self.add_layer:
-                raise ValueError(
-                    'Unknown layer type "{}" in "{}"'.format(
-                        layer_type, layer_name))
+                raise ValueError('Unknown layer type "{}" in "{}"'.format(
+                    layer_type, layer_name))
 
             self.add_layer[layer_type](**layer)
             print('Layer "{}" of type "{}" done.'.format(
@@ -183,9 +184,9 @@ class Toolbox():
         :type name: str, optional
         :param position: Defaults to (0, 0)
         :type position: tuple, optional
-        :param addToPosition: Layering (-1 adds the layer to a recently
-            defined group), defaults to 0
-        :type addToPosition: int, optional
+        :param add_to_position: Layering (-1 adds the layer to
+            a recently defined group), defaults to 0
+        :type add_to_position: int, optional
         :raises RuntimeError: If there is no image
         """
         if self.image is None:
@@ -222,14 +223,14 @@ class Toolbox():
                             name=None, position=(0, 0), **kwargs):
         """ Copy layer from a data image.
 
-        :param targetFile: Use **name** filled in ``import_layer_load``
-        :type targetFile: str
-        :param targetLayer: Name of the layer to be imported in the
+        :param target_file: Use **name** filled in ``import_layer_load``
+        :type target_file: str
+        :param target_layer: Name of the layer to be imported in the
             target file
-        :type targetLayer: str
-        :param addToPosition: Layering (-1 adds the layer to a recently
+        :type target_layer: str
+        :param add_to_position: Layering (-1 adds the layer to a recently
             defined group), defaults to 0
-        :type addToPosition: int, optional
+        :type add_to_position: int, optional
         :param name: Layer name, defaults to **targetLayer**
         :type name: str or None, optional
         :param position: Defaults to (0, 0)
@@ -252,12 +253,12 @@ class Toolbox():
     def _layer_group(self, add_to_position=0, name='Group', **kwargs):
         """ Create new layer group.
 
-        To fill next layers in, set theirs **addToPosition** parameter
+        To fill next layers in, set theirs **add_to_position** parameter
         to -1.
 
-        :param addToPosition: Layering (-1 adds the layer to a recently
+        :param add_to_position: Layering (-1 adds the layer to a recently
             defined group), defaults to 0
-        :type addToPosition: int, optional
+        :type add_to_position: int, optional
         :param name: Group name, defaults to "Group"
         :type name: str, optional
         :raises RuntimeError: If there is no image
@@ -279,13 +280,13 @@ class Toolbox():
         :type text: str
         :param font: Font name
         :type font: str
-        :param fontSize: Font size
-        :type fontSize: int
-        :param fontScale: Multiply **fontSize**, defaults to 1
-        :type fontScale: float, optional
-        :param addToPosition: Layering (-1 adds the layer to a recently
+        :param font_size: Font size
+        :type font_size: int
+        :param font_scale: Multiply **fontSize**, defaults to 1
+        :type font_scale: float, optional
+        :param add_to_position: Layering (-1 adds the layer to a recently
             defined group), defaults to 0
-        :type addToPosition: int, optional
+        :type add_to_position: int, optional
         :param name: Layer name, defaults to None (Gimp default)
         :type name: str or None, optional
         :param color: Text color in hex code, defaults to “#000000”
@@ -293,10 +294,10 @@ class Toolbox():
         :param size: Layer dimensions in pixels, defaults to
             None (autosize)
         :type size: tuple or None
-        :param lineSpacing: Line separation change, defaults to 0
-        :type lineSpacing: float, optional
-        :param letterSpacing: Letters separation change, defaults to 0
-        :type letterSpacing: float, optional
+        :param line_spacing: Line separation change, defaults to 0
+        :type line_spacing: float, optional
+        :param letter_spacing: Letters separation change, defaults to 0
+        :type letter_spacing: float, optional
         :param justification: Either left(0), right(1), center(2) or
             fill(3), defaults to 0
         :type justification: int, optional
@@ -325,7 +326,7 @@ class Toolbox():
                       top=0, bottom=100, **kwargs):
         """ New selection by percentage of image size.
 
-        :param mode: Either "select", "selectInvert", or "deselect",
+        :param mode: Either "select", "select_invert", or "deselect",
             defaults to "select"
         :type mode: str
         :param left: Left edge position in percentage of the image size,
@@ -348,7 +349,7 @@ class Toolbox():
         if self.image is None:
             raise RuntimeError('Image to add the layer to not found.')
 
-        if mode == 'select' or mode == 'selectInvert':
+        if mode.startswith('select'):
             x = round(gimpfu.pdb.gimp_image_width(self.image) * left / 100)
             y = round(gimpfu.pdb.gimp_image_height(self.image) * top / 100)
             width = round(
@@ -366,7 +367,7 @@ class Toolbox():
                 self.image, 0,  # GIMP_CHANNEL_OP_ADD
                 x, y, width, height)
             # Be aware of possible interference with _layer_mask() deselect.
-            if mode == 'selectInvert':
+            if mode == 'select_invert':
                 gimpfu.pdb.gimp_selection_invert(self.image)
 
         elif mode == 'deselect':
@@ -380,8 +381,8 @@ class Toolbox():
 
         Create mask for given layer from given selection.
 
-        :param targetLayer: Target layer to be masked
-        :type targetLayer: str
+        :param target_layer: Target layer to be masked
+        :type target_layer: str
         :param kwargs: Additional named arguments are passed to
             ``select``
         :type kwargs: various, optional
@@ -407,7 +408,7 @@ class Toolbox():
         
         Filemane: **image.name**.xcf into folder :attr:`saveDirectory`
         (subfolder of :attr:`dataFolder`).
-         """
+        """
         directory = self.data_folder + self.save_directory
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -422,8 +423,8 @@ class Toolbox():
 
         Colors are sorted by their branch hight and then alphabetically.
 
-        :param paletteID: Path to the starting node.
-        :type paletteID: str
+        :param palette_ID: Path to the starting node.
+        :type palette_ID: str
         :param name: Created palette name
         :type name: str
         """
@@ -434,45 +435,45 @@ class Toolbox():
 
 
 gimpfu.register(
-    proc_name="CA_palette_assembler",  # Used in Procedure browser.
-    blurb="Create palette." + " " * 50,  # Widget title.
-    help="Create palette.",
-    author="Martin Brajer",
-    copyright="Martin Brajer",
-    date="May 2020",  # Copyright date.
-    label="Palette Assembler",  # Menu entry.
-    imagetypes="",  # No image required (imagetypes).
+    proc_name='CA_palette_assembler',  # Used in Procedure browser.
+    blurb='Create palette.' + ' ' * 50,  # Widget title.
+    help='Create palette.',
+    author='Martin Brajer',
+    copyright='Martin Brajer',
+    date='May 2020',  # Copyright date.
+    label='Palette Assembler',  # Menu entry.
+    imagetypes='',  # No image required (imagetypes).
     params=[
-        (gimpfu.PF_DIRNAME, "dataFolder", "Data folder:",
+        (gimpfu.PF_DIRNAME, 'dataFolder', 'Data folder:',
             os.path.expanduser('~')),
-        (gimpfu.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
-        (gimpfu.PF_TEXT, "paletteID", "Palette ID:", "color"),
-        (gimpfu.PF_TEXT, "name", "Name:", "Card Assembler Palette"),
+        (gimpfu.PF_STRING, 'xmlFile', 'XML file:', 'Blueprint.xml'),
+        (gimpfu.PF_TEXT, 'paletteID', 'Palette ID:', 'color'),
+        (gimpfu.PF_TEXT, 'name', 'Name:', 'Card Assembler Palette'),
         ],
     results=[],
     function=palette_creator,
-    menu="<Image>/Card Assembler"
+    menu='<Image>/Card Assembler'
     )
 
 gimpfu.register(
-    proc_name="CA_card_assembler",  # Used in Procedure browser.
-    blurb="Create board-game cards." + " " * 40,  # Widget title.
-    help="Create board-game cards.",
-    author="Martin Brajer",
-    copyright="Martin Brajer",
-    date="April 2020",  # Copyright date.
-    label="Card Assembler",  # Menu entry.
-    imagetypes="",  # No image required (imagetypes).
+    proc_name='CA_card_assembler',  # Used in Procedure browser.
+    blurb='Create board-game cards.' + ' ' * 40,  # Widget title.
+    help='Create board-game cards.',
+    author='Martin Brajer',
+    copyright='Martin Brajer',
+    date='April 2020',  # Copyright date.
+    label='Card Assembler',  # Menu entry.
+    imagetypes='',  # No image required (imagetypes).
     params=[
-        (gimpfu.PF_DIRNAME, "dataFolder", "Data folder:",
+        (gimpfu.PF_DIRNAME, 'dataFolder', 'Data folder:',
             os.path.expanduser('~')),
-        (gimpfu.PF_STRING, "xmlFile", "XML file:", "Blueprint.xml"),
-        (gimpfu.PF_TEXT, "cardIDs", "Card IDs:", ""),
-        (gimpfu.PF_BOOL, "save", "Save:", False),
+        (gimpfu.PF_STRING, 'xmlFile', 'XML file:', 'Blueprint.xml'),
+        (gimpfu.PF_TEXT, 'cardIDs', 'Card IDs:', ''),
+        (gimpfu.PF_BOOL, 'save', 'Save:', False),
         ],
     results=[],
     function=card_creator,
-    menu="<Image>/Card Assembler"
+    menu='<Image>/Card Assembler'
     )
 
 gimpfu.main()
