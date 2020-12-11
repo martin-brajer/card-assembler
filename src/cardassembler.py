@@ -9,7 +9,7 @@ Written for `Gimp 2.10.18 <https://www.gimp.org/>`_ which uses
 
 Probably: Gimp runs this script through :func:`eval()` function inside
 its installation folder and direct import from different folder raises
-*access denied error*. See :meth:`_run_code` function in 
+*access denied error*. See :meth:`_run_code` function in
 :file:`{Gimp installation folder}/lib/python2.7/runpy.py`.
 """
 
@@ -25,8 +25,9 @@ import sys
 
 import gimpfu
 
+# Same folder as this script.
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-import blueprint  # Same folder as this script.
+import blueprint  # nopep8
 
 
 __version__ = blueprint.__version__
@@ -63,9 +64,10 @@ def card_creator(data_folder, xml_file, card_IDs, save):
         toolbox.create_image(card_ID)
         if save:
             toolbox.save_image()
-    
+
     if keep_cmd_open:
         raw_input('\nPress Enter to close this window!')
+
 
 def palette_creator(data_folder, xml_file, palette_ID, name):
     """ Create palette.
@@ -157,7 +159,7 @@ class Toolbox():
             self.add_layer[layer_type](**layer)
             print('Layer "{}" of type "{}" done.'.format(
                 layer_name, layer_type))
-        
+
         display = gimpfu.pdb.gimp_display_new(self.image)
         print('-' * 20)
 
@@ -271,9 +273,9 @@ class Toolbox():
         layer_group.name = name
 
     def _layer_text(self, text, font, font_size, font_scale=1,
-        add_to_position=0, name=None, color='#000000', size=None,
-        line_spacing=0, letter_spacing=0, justification=0,
-        position=(0, 0), **kwargs):
+                    add_to_position=0, name=None, color='#000000', size=None,
+                    line_spacing=0, letter_spacing=0, justification=0,
+                    position=(0, 0), **kwargs):
         """ Text layer.
 
         :param text: Text
@@ -318,7 +320,8 @@ class Toolbox():
         if size is not None:
             gimpfu.pdb.gimp_text_layer_resize(textLayer, *size)
         gimpfu.pdb.gimp_text_layer_set_line_spacing(textLayer, line_spacing)
-        gimpfu.pdb.gimp_text_layer_set_letter_spacing(textLayer, letter_spacing)
+        gimpfu.pdb.gimp_text_layer_set_letter_spacing(
+            textLayer, letter_spacing)
         gimpfu.pdb.gimp_text_layer_set_justification(textLayer, justification)
         gimpfu.pdb.gimp_layer_set_offsets(textLayer, *position)
 
@@ -389,7 +392,8 @@ class Toolbox():
         """
         self._layer_select(**kwargs)
 
-        layer = gimpfu.pdb.gimp_image_get_layer_by_name(self.image, target_layer)
+        layer = gimpfu.pdb.gimp_image_get_layer_by_name(
+            self.image, target_layer)
         mask = gimpfu.pdb.gimp_layer_create_mask(layer, 4)
         gimpfu.pdb.gimp_layer_add_mask(layer, mask)
 
@@ -405,7 +409,7 @@ class Toolbox():
 
     def save_image(self):
         """ Save the image.
-        
+
         Filemane: **image.name**.xcf into folder :attr:`saveDirectory`
         (subfolder of :attr:`dataFolder`).
         """

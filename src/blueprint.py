@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-    path = 'D:\DokumentyM\Hry\Proroctví\Cards\Data'
+    path = ''
     blueprint = Blueprint((path + '\\Blueprint.xml').decode('utf-8'))
     layout = blueprint.generate_layout('unique item example')
     palette = blueprint.generate_palette('color')
@@ -79,7 +79,7 @@ class Blueprint():
                     new_dict[key] = ', '.join((new_dict[key], text))
                 else:
                     new_dict[key] = text
-                
+
             # No text, go down the level.
             else:
                 new_dict[key] = self._ElementTree_to_dict(child)
@@ -107,7 +107,7 @@ class Blueprint():
 
         elif target_type == 'tuple':
             return tuple(self._parse(item, 'int') for item in
-                            text.replace(' ', '').split(','))
+                         text.replace(' ', '').split(','))
 
         raise ValueError('Unknown "{}" target type!'.format(target_type))
 
@@ -221,22 +221,18 @@ class Blueprint():
         return palette
 
 
-class TestBlueprintModule(unittest.TestCase):
+class TestCodeFormat(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-
-        cls.blueprint = Blueprint(None)
-        #: Beginning of example :file:`Minimal blueprint.xml`.
-        XML = (
-            '<data><card><command01_image><layerType>image</layerType>'
-            '<size parse="tuple">800, 500</size></command01_image>'
-            '</card></data>'
-            )
-        cls.element_tree = ET.fromstring(XML)
-        #: Dict representation of :data:`XML`.
-        cls.DICT = {'card': {'command01_image':
-            {'layerType': 'image', 'size': (800, 500)}}}
+    def test_conformance(self):
+        """Test that we conform to PEP-8."""
+        import pycodestyle
+        style = pycodestyle.StyleGuide()  # (quiet=True)
+        result = style.check_files([
+            'src\\blueprint.py',
+            'src\\cardassembler.py'
+            ])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors (and warnings).")
 
     def test_version(self):
         """ Test whether :data:`__version__` follows
@@ -246,13 +242,31 @@ class TestBlueprintModule(unittest.TestCase):
         #: FAQ: Is there a suggested regular expression (RegEx) to
         # check a SemVer string?
         pattern = (
-            '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0'
-            '|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-'
-            '9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*'
-            '))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)'
-            '*))?$'
+            r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0'
+            r'|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-'
+            r'9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*'
+            r'))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)'
+            r'*))?$'
             )
         self.assertTrue(re.search(pattern, __version__))
+
+
+class TestBlueprintMethods(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        cls.blueprint = Blueprint(None)
+        #: Beginning of example :file:`Minimal blueprint.xml`.
+        XML = (
+            '<data><card><command01_image><layer_type>image</layer_type>'
+            '<size parse="tuple">800, 500</size></command01_image>'
+            '</card></data>'
+            )
+        cls.element_tree = ET.fromstring(XML)
+        #: Dict representation of :data:`XML`.
+        cls.DICT = {'card': {'command01_image': {'layer_type': 'image',
+                    'size': (800, 500)}}}
 
     def test_parse_int(self):
         self.assertEqual(self.blueprint._parse('5', 'int'), 5)
@@ -281,5 +295,5 @@ class TestBlueprintModule(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # unittest.main(exit=False)
-    main()
+    unittest.main(exit=False)
+    # main()
