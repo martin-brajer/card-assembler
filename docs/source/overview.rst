@@ -14,8 +14,8 @@ Card Assembler is a free and open-source plug-in for
 `Gimp <https://www.gimp.org/>`_. Assembles an image according to an XML file
 blueprint. Meant for board game card creation.
 
-| Source code can be found on `Github <https://github.com/martin-brajer/card-assembler>`_.
-| Versioning follows `Semantic Versioning 2.0.0 <https://semver.org/>`_.
+Source code can be found on `Github <https://github.com/martin-brajer/card-assembler>`_.
+
 
 Features
 --------
@@ -26,12 +26,14 @@ Features
 * Command chaining, making templates possible.
 * Export colors used in blueprint to Gimp as a palette.
 
+
 Installation
 ------------
 
 Copy all PY files from :file:`src/` into :file:`card-assembler/`
 in your Gimp plug-in folder:
 :file:`{user}/AppData/Roaming/GIMP/{version}/plug-ins/`. Then **restart Gimp**.
+
 
 How to use this plug in
 -----------------------
@@ -57,6 +59,15 @@ There is a new item in the menu bar - :guilabel:`Card Assembler` containing:
    * :guilabel:`PaletteID`: Path to the colors starting node (assuming there is
      a special color subtree).
    * :guilabel:`Name`: The new palette's name.
+
+
+Compliance
+----------
+
+| Versioning follows `Semantic Versioning 2.0.0 <https://semver.org/>`_.
+| Following `PEP8 Style Guide <https://www.python.org/dev/peps/pep-0008/>`_ coding conventions.
+| Testing with :mod:`unittest` and `pycodestyle <https://pypi.org/project/pycodestyle/>`_.
+
 
 License
 -------

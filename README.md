@@ -9,7 +9,6 @@ image according to an xml file blueprint. Meant for board game card
 creation.
 
 Documentation can be found on [Read the Docs](https://card-assembler.readthedocs.io/en/latest/). \
-Versioning follows [Semantic Versioning 2.0.0](https://semver.org/).
 
 # Features
 
@@ -18,6 +17,14 @@ Versioning follows [Semantic Versioning 2.0.0](https://semver.org/).
 * Load card layout information from an xml file blueprint.
 * Command chaining, making templates possible.
 * Export colors used in blueprint to Gimp palette.
+
+# Compliance
+
+Versioning follows [Semantic Versioning 2.0.0](https://semver.org/). \
+Following [PEP8 Style Guide](https://www.python.org/dev/peps/pep-0008/)
+coding conventions. \
+Testing with [unittest](https://docs.python.org/2.7/library/unittest.html#module-unittest)
+and [pycodestyle](https://pypi.org/project/pycodestyle/).
 
 # License
 
