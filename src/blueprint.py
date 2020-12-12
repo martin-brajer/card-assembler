@@ -20,8 +20,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 
-def main():
-    path = ''
+def main(path):
     blueprint = Blueprint((path + '\\Blueprint.xml').decode('utf-8'))
     layout = blueprint.generate_layout('unique item example')
     palette = blueprint.generate_palette('color')
@@ -54,7 +53,10 @@ class Blueprint():
 
     def _ElementTree_to_dict(self, parent):
         """ Translation from :mod:`xml.etree.ElementTree` to
-        :class:`dict` tree from the given node down (recursive).
+        :class:`dict` tree from the given node down.
+
+        If a node have multiple tags with the same name, its text is
+        joined by "\n".
 
         :param parent: A node of ElementTree
         :type parent: :class:`ElementTree.Element`
@@ -63,7 +65,7 @@ class Blueprint():
         """
         new_dict = {}
         for child in parent:
-            key = child.tag
+            tag = child.tag
             text = child.text
             # First condition: "item.text" is None <=> "<item></item>".
             # Second condition: is there actual information? Symbols
@@ -75,14 +77,14 @@ class Blueprint():
                 if child.attrib and 'parse' in child.attrib:
                     text = self._parse(text, child.attrib['parse'])
 
-                if key in new_dict:
-                    new_dict[key] = ', '.join((new_dict[key], text))
+                if tag in new_dict:
+                    new_dict[tag] = '\n'.join((new_dict[tag], text))
                 else:
-                    new_dict[key] = text
+                    new_dict[tag] = text
 
             # No text, go down the level.
             else:
-                new_dict[key] = self._ElementTree_to_dict(child)
+                new_dict[tag] = self._ElementTree_to_dict(child)
         return new_dict
 
     def _parse(self, text, target_type):
@@ -141,7 +143,7 @@ class Blueprint():
         for key, value in self._goto(this_step).items():
             # Next is not written into layout. It stores further direction.
             if key == 'next':
-                for next_step in value.split(', '):
+                for next_step in value.split('\n'):
                     next_steps.append(next_step)
             # If lower levels can be reached.
             elif isinstance(value, dict):
@@ -296,4 +298,4 @@ class TestBlueprintMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(exit=False)
-    # main()
+    # main('')
