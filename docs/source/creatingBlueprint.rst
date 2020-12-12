@@ -31,7 +31,7 @@ Concatenation
 -------------
 
 If a node have multiple tags with the same name, their contents are
-joined by "\\n". The two following pieces of code are equivalent:
+joined by ``\n``. The two following pieces of code are equivalent:
 
 .. code:: xml
 
