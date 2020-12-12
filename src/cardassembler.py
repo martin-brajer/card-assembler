@@ -186,7 +186,7 @@ class Toolbox():
         :type name: str, optional
         :param position: Defaults to (0, 0)
         :type position: tuple, optional
-        :param add_to_position: Layering (-1 adds the layer to
+        :param add_to_position: Position among layers (-1 adds the layer to
             a recently defined group), defaults to 0
         :type add_to_position: int, optional
         :raises RuntimeError: If there is no image
@@ -230,10 +230,10 @@ class Toolbox():
         :param target_layer: Name of the layer to be imported in the
             target file
         :type target_layer: str
-        :param add_to_position: Layering (-1 adds the layer to a recently
-            defined group), defaults to 0
+        :param add_to_position: Position among layers (-1 adds the layer to
+            a recently defined group), defaults to 0
         :type add_to_position: int, optional
-        :param name: Layer name, defaults to **targetLayer**
+        :param name: Layer name, defaults to **target_layer**
         :type name: str or None, optional
         :param position: Defaults to (0, 0)
         :type position: tuple, optional
@@ -256,10 +256,10 @@ class Toolbox():
         """ Create new layer group.
 
         To fill next layers in, set theirs **add_to_position** parameter
-        to -1.
+        to ``-1``.
 
-        :param add_to_position: Layering (-1 adds the layer to a recently
-            defined group), defaults to 0
+        :param add_to_position: Position among layers (-1 adds the layer to
+            a recently defined group), defaults to 0
         :type add_to_position: int, optional
         :param name: Group name, defaults to "Group"
         :type name: str, optional
@@ -284,10 +284,10 @@ class Toolbox():
         :type font: str
         :param font_size: Font size
         :type font_size: int
-        :param font_scale: Multiply **fontSize**, defaults to 1
+        :param font_scale: Multiply **font_size**, defaults to 1
         :type font_scale: float, optional
-        :param add_to_position: Layering (-1 adds the layer to a recently
-            defined group), defaults to 0
+        :param add_to_position: Position among layers (-1 adds the layer to
+            a recently defined group), defaults to 0
         :type add_to_position: int, optional
         :param name: Layer name, defaults to None (Gimp default)
         :type name: str or None, optional
@@ -329,7 +329,7 @@ class Toolbox():
                       top=0, bottom=100, **kwargs):
         """ New selection by percentage of image size.
 
-        :param mode: Either "select", "select_invert", or "deselect",
+        :param mode: Either "select", "select_invert" or "deselect",
             defaults to "select"
         :type mode: str
         :param left: Left edge position in percentage of the image size,
@@ -382,9 +382,9 @@ class Toolbox():
     def _layer_mask(self, target_layer, **kwargs):
         """ Mask layer.
 
-        Create mask for given layer from given selection.
+        Create a mask for the given layer from the given selection.
 
-        :param target_layer: Target layer to be masked
+        :param target_layer: Layer to be masked
         :type target_layer: str
         :param kwargs: Additional named arguments are passed to
             ``select``
@@ -403,7 +403,7 @@ class Toolbox():
     def _layer_hide(self, **kwargs):
         """ Ignore command.
 
-        Meant for overrides, i.e. hiding a predefined (template) layer.
+        Used for overrides, i.e. hiding a predefined (template) layer.
         """
         pass
 
