@@ -1,141 +1,105 @@
 Layer types
 ===========
 
-Parameters here show tags of an XML blueprint relevant for the given layer types.
+All layer nodes can use ``next`` tag, see
+:ref:`Creating blueprint > Nesting <Create a blueprint Nesting>`.
+In the following list of layer types parameters are formatted as follows:
 
-Additionally, all commands can use ``next`` tag. See
-:ref:`Creating blueprint > Nesting<Create a blueprint Nesting>`
+* **name** (:class:`type`, ``default if optional``) Description
 
-.. method:: image()
+.. _group:
+.. note::
+    Setting ``add_to_position = -1`` adds the layer to a recently defined
+    group.
+
+image
+-----
    
-   Create new image. Needed for layer creation.
+Create new image. Needed for any layer creation.
 
-   :param size: Image dimensions in pixels
-   :type size: tuple
-   :param name: Image name, defaults to "Card Assembler Image"
-   :type name: str
+* **size** (:class:`tuple`) Image dimensions in pixels note
+* **name** (:class:`str`, ``Card Assembler Image``) Image name
 
-.. method:: monochrome()
+monochrome
+----------
    
-   Single color filled layer.
+Single color filled layer.
 
-   :param size: Layer dimensions in pixels
-   :type size: tuple
-   :param color: Hex code
-   :type color: str
-   :param name: Layer name, defaults to "Monochrome"
-   :type name: str, optional
-   :param position: Defaults to (0, 0)
-   :type position: tuple, optional
-   :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
-   :type addToPosition: int, optional
-   :raises RuntimeError: If there is no image
+* **size** (:class:`tuple`) Layer dimensions in pixels
+* **color** (:class:`str`) Layer color in hex code
+* **name** (:class:`str`, ``Monochrome``): Layer name
+* **position** (:class:`tuple`, ``0, 0``)
+* **add_to_position** (:class:`int`, ``0``) Position among layers (``-1`` for group_)
 
-.. method:: import_layer_load()
+import_layer_load
+-----------------
 
-   Load new data image.
+Load new data image. The file has to be in the data folder. Filename is
+specified in the XML file. Name parameter is used in the XML file to reference
+the imported file. That’s why it’s not an optional parameter.
 
-   The file has to be in the data folder. Filename is specified in the
-   xml file. Name parameter is used in xml file to reference the imported
-   file. That's why it's not optional parameter.
+* **filename** (:class:`str`) See description
+* **name** (:class:`str`) Name the data for future use by `import_layer`_
 
-   :param filename: See description
-   :type filename: str
-   :param name: Name the data for future use by ``import_layer``
-   :type name: str
+import_layer
+------------
    
-   :raises RuntimeError: If there is no image
+Copy layer from a data image.
 
-.. method:: import_layer()
-   
-   Copy layer from a data image.
+* **target_file** (:class:`str`) Use **name** filled in `import_layer_load`_
+* **target_layer** (:class:`str`) Name of the layer to be imported in the target file
+* **add_to_position** (:class:`int`, ``0``) Position among layers (``-1`` for group_)
+* **name** (:class:`str`, **target_layer**) Layer name
+* **position** (:class:`tuple`, ``0, 0``)
 
-   :param targetFile: Use **name** filled in ``import_layer_load``
-   :type targetFile: str
-   :param targetLayer: Name of the layer to be imported in the target file
-   :type targetLayer: str
-   :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
-   :type addToPosition: int, optional
-   :param name: Layer name, defaults to **targetLayer**
-   :type name: str, optional
-   :param position: Defaults to (0, 0)
-   :type position: tuple, optional
-   :raises RuntimeError: If there is no image
+group
+-----
 
-.. method:: group()
+Create new layer group. To fill next layers in, set theirs **add_to_position**
+parameter to ``-1``.
 
-   Create new layer group.
+* **add_to_position** (:class:`int`, ``0``) Position among layers (``-1`` for group_)
+* **name** (:class:`str`, ``Group``) Group name
 
-   To fill next layers in, set theirs **addToPosition** parameter to -1.
+text
+----
 
-   :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
-   :type addToPosition: int, optional
-   :param name: Group name, defaults to "Group"
-   :type name: str, optional
-   :raises RuntimeError: If there is no image
+Text layer.
 
-.. method:: text()
-   
-   Text layer.
+* **text** (:class:`str`) Text
+* **font** (:class:`str`) Font name
+* **font_size** (:class:`int`) Font size
+* **font_scale** (:class:`float`, ``1``) Multiply **font_size**
+* **add_to_position** (:class:`int`, ``0``) Position among layers (``-1`` for group_)
+* **name** (:class:`str`, Gimp default = ``Text Layer``) Layer name
+* **color** (:class:`str`, ``#000000``) Text color in hex code
+* **size** (:class:`tuple`, autosize) Layer dimensions in pixels
+* **line_spacing** (:class:`float`, ``0``) Line separation change
+* **letter_spacing** (:class:`float`, ``0``) Letters separation change
+* **justification** (:class:`int`, ``0``) Either left (``0``), right (``1``),
+  center (``2``) or fill (``3``)
+* **position** (:class:`tuple`, ``0, 0``)
 
-   :param text: Text
-   :type size: str
-   :param font: Font name
-   :type font: str
-   :param fontSize: Font size
-   :type fontSize: int
-   :param fontScale: Multiply **fontSize**, defaults to 1
-   :type fontScale: float, optional
-   :param addToPosition: Layering (-1 adds the layer to a recently defined group), defaults to 0
-   :type addToPosition: int, optional
-   :param name: Layer name, defaults to "Text Layer" (Gimp default)
-   :type name: str, optional
-   :param color: Text color in hex code, defaults to “#000000” (black)
-   :type color: str, optional
-   :param size: Layer dimensions in pixels, defaults to *autosize*
-   :type size: tuple
-   :param lineSpacing: Line separation change, defaults to 0
-   :type lineSpacing: float, optional
-   :param letterSpacing: Letters separation change, defaults to 0
-   :type letterSpacing: float, optional
-   :param justification: Either left(0), right(1), center(2) or fill(3), defaults to 0
-   :type justification: int, optional
-   :param position: Defaults to (0, 0)
-   :type position: tuple, optional
-   :raises RuntimeError: If there is no image
+select
+------
 
-.. method:: select()
-   
-   New selection by percentage of image size.
+New selection by percentage of image size.
 
-   :param mode: Either "select" or "deselect", defaults to the former one
-   :type mode: str
-   :param left: Left edge position in percentage of the image size, defaults to 0
-   :type left: float, optional
-   :param right: Right edge position in percentage of the image size, defaults to 100
-   :type right: float, optional
-   :param top: Top edge position in percentage of the image size, defaults to 0
-   :type top: float, optional
-   :param botton: Bottom edge position in percentage of the image size, defaults to 100
-   :type bottom: float, optional
-   :raises RuntimeError: If there is no image
-   :raises ArithmeticError: If width is not positive
-   :raises ArithmeticError: If height is not positive
-   :raises ValueError: If mode is unknown
+* **mode** (:class:`str`, ``select``) Either ``select``, ``select_invert`` or ``deselect``
+* **left** (:class:`float`, ``0``) Left edge position in percentage of the image size
+* **right** (:class:`float`, ``100``) Right edge position in percentage of the image size
+* **top** (:class:`float`, ``0``) Top edge position in percentage of the image size
+* **botton** (:class:`float`, ``100``) Bottom edge position in percentage of the image size
 
-.. method:: mask()
+mask
+----
 
-   Mask layer.
+Mask layer. Create a mask for the given layer from the given selection.
 
-   Create mask for given layer from given selection.
+* **target_layer** (:class:`str`) Layer to be masked
+* other parameters are passed to `select`_
 
-   :param layer: Target layer to select from
-   :type layer: str
-   :param parameters: Other parameters to be passed to ``select``
-   :type parameters: ``select``
+hide
+----
 
-.. method:: hide()
-   
-   Ignore command.
-
-   Meant for overrides, i.e. hiding a predefined (template) layer.
+Ignore command. Used for overrides, i.e. hiding a predefined (template) layer.
