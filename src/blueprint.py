@@ -52,11 +52,11 @@ class Blueprint():
         return self._ElementTree_to_dict(root)
 
     def _ElementTree_to_dict(self, parent):
-        """ Translation from :mod:`xml.etree.ElementTree` to
+        r""" Translation from :mod:`xml.etree.ElementTree` to
         :class:`dict` tree from the given node down.
 
-        If a node have multiple tags with the same name, its text is
-        joined by "\n".
+        If a node have multiple tags with the same name, their
+        (pre-parse) text is joined by "\\n".
 
         :param parent: A node of ElementTree
         :type parent: :class:`ElementTree.Element`

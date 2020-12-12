@@ -1,9 +1,9 @@
 Create a blueprint
 ====================
 
-Card Assembler works with tree structure. When calling the plug-in in Gimp,
-you specify which node to start at. Its children are then alphabetically
-called to formulate respective layer builders.
+Card Assembler works with an XML tree structure. When calling the plug-in
+in Gimp, you specify which node to start at. Its children are then
+alphabetically called to formulate respective layer builders.
 
 .. warning::
    Each layer must include ``layer_type`` tag! Accepted values are listed in
@@ -15,6 +15,32 @@ called to formulate respective layer builders.
    load a file etc.
 
 .. _Create a blueprint Nesting:
+
+Parsing
+-------
+
+If a parameter :class:`type` is not :class:`str`, add attribute ``parse`` to
+the parameter's tag with value :class:`int`, :class:`float` or :class:`tuple`
+as needed. For example:
+
+.. code:: xml
+
+   <position parse="tuple">100, 125</position>
+
+Concatenation
+-------------
+
+If a node have multiple tags with the same name, their contents are
+joined by "\\n". The two following pieces of code are equivalent:
+
+.. code:: xml
+
+   <text>Hello,\nWord</text>
+
+.. code:: xml
+
+   <text>Hello,</text>
+   <text>Word<text>
 
 Nesting
 -------
@@ -50,17 +76,6 @@ exported into Gimp as a palette.
     <color>
         <black>#ffffff</black>
     </color>
-
-Parsing
--------
-
-If a parameter :class:`type` is not :class:`str`, add attribute ``parse`` to
-the parameter's tag with value :class:`int`, :class:`float` or :class:`tuple`
-as needed. For example:
-
-.. code:: xml
-
-   <position parse="tuple">100, 125</position>
 
 Examples
 --------
