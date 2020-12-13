@@ -89,7 +89,7 @@ a minimal blueprint to start with. The second one shows intended use.
 
 * :file:`Blueprint using a template.xml` + :file:`Data image.xcf`
    
-   To assemble the this card, use "unique spell example" as **CardIDs**.
+   To assemble the this card, use "unique spell soothingWinds" as **CardIDs**.
    
    The first tag (under the mentioned path) refers to the template for all
    spell cards, where universal details (such as title position) are specified.
