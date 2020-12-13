@@ -163,8 +163,8 @@ class Blueprint():
                 layout[key] = value
 
         # Recursively browse all "next" branches.
-        while next_steps:
-            layout = self._step_in(layout, next_steps.pop())
+        for next_step in next_steps:
+            layout = self._step_in(layout, next_step)
         return layout
 
     def _goto(self, next_steps):
