@@ -27,20 +27,15 @@ as needed. For example:
 
    <position parse="tuple">100, 125</position>
 
-Concatenation
--------------
+Newline
+-------
 
-If a node have multiple tags with the same name, their contents are
-joined by ``\n``. The two following pieces of code are equivalent:
-
-.. code:: xml
-
-   <text>Hello,\nWord</text>
+To get multiline text, use ``\n`` or input ``text`` tag multiple times.
 
 .. code:: xml
 
-   <text>Hello,</text>
-   <text>Word<text>
+   <text>First line\nSecond line</text>
+   <text>Third line</text>
 
 Nesting
 -------

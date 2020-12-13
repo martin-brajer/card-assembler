@@ -36,6 +36,10 @@ class Blueprint():
     :type file_path: str or None
     """
 
+    #: Those tags are always stored in a :class:`list` & have extra treatment
+    # in :meth:`_step_in`.
+    SPECIAL_TAGS = ['next', 'text']
+
     def __init__(self, file_path):
         # Dict tree representation of the given XML file.
         self.data = self._load(file_path) if file_path is not None else None
@@ -52,18 +56,17 @@ class Blueprint():
         return self._ElementTree_to_dict(root)
 
     def _ElementTree_to_dict(self, parent):
-        r""" Translation from :mod:`xml.etree.ElementTree` to
+        """ Translation from :mod:`xml.etree.ElementTree` to
         :class:`dict` tree from the given node down.
 
-        If a node have multiple tags with the same name, their
-        (pre-parse) text is joined by "\\n".
+        Tags in :data:`SPECIAL_TAGS` are stored in a :class:`list`.
 
         :param parent: A node of ElementTree
         :type parent: :class:`ElementTree.Element`
         :return: Dictionary representation of the given tree
         :rtype: dict
         """
-        new_dict = {}
+        node = {}
         for child in parent:
             tag = child.tag
             text = child.text
@@ -77,15 +80,15 @@ class Blueprint():
                 if child.attrib and 'parse' in child.attrib:
                     text = self._parse(text, child.attrib['parse'])
 
-                if tag in new_dict:
-                    new_dict[tag] = '\n'.join((new_dict[tag], text))
+                if tag in node:
+                    node[tag].append(text)
                 else:
-                    new_dict[tag] = text
+                    node[tag] = [text] if tag in self.SPECIAL_TAGS else text
 
             # No text, go down the level.
             else:
-                new_dict[tag] = self._ElementTree_to_dict(child)
-        return new_dict
+                node[tag] = self._ElementTree_to_dict(child)
+        return node
 
     def _parse(self, text, target_type):
         """ ElementTree.element.text to various python types.
@@ -130,7 +133,9 @@ class Blueprint():
     def _step_in(self, layout, this_step):
         """ Browse data guided by the ``next`` tag.
 
-        Do not overwrite (first in stays).
+        Do not overwrite (first in stays). Further ``next`` tags are served
+        successively in the order according to the XML file. If there are
+        multiple ``text`` tags, join them by ``\\n``
 
         :param layout: Input layout
         :type layout: dict
@@ -143,8 +148,8 @@ class Blueprint():
         for key, value in self._goto(this_step).items():
             # Next is not written into layout. It stores further direction.
             if key == 'next':
-                for next_step in value.split('\n'):
-                    next_steps.append(next_step)
+                next_steps.extend(value)
+
             # If lower levels can be reached.
             elif isinstance(value, dict):
                 if key not in layout:
@@ -153,6 +158,8 @@ class Blueprint():
                     layout[key], ' '.join((this_step, key)))
             # Keys having values from previous levels are NOT changed.
             elif key not in layout:
+                if key == 'text':
+                    value = '\n'.join(*value)
                 layout[key] = value
 
         # Recursively browse all "next" branches.
