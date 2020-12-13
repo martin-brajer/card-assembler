@@ -159,7 +159,7 @@ class Blueprint():
             # Keys having values from previous levels are NOT changed.
             elif key not in layout:
                 if key == 'text':
-                    value = '\n'.join(*value)
+                    value = '\n'.join(value)
                 layout[key] = value
 
         # Recursively browse all "next" branches.
