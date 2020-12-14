@@ -6,11 +6,13 @@
 Welcome to Card Assembler's documentation!
 ==========================================
 
+.. include:: ./_overview.rst
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   overview
+   cardAssemblerOverview
    creatingBlueprint
    layerTypes
    modules/modules

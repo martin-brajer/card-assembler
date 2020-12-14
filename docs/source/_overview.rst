@@ -1,5 +1,5 @@
-Card Assembler overview
-=======================
+.. Referenced in ``index.rst`` and ``cardAssemblerOverview`` with
+   different titles following its roles.
 
 |Last release| |License| |Documentation Status|
 
