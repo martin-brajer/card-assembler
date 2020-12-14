@@ -30,9 +30,9 @@ Features
 Installation
 ------------
 
-Copy all PY files from :file:`src/` into :file:`card-assembler/`
-in your Gimp plug-in folder:
-:file:`{user}/AppData/Roaming/GIMP/{version}/plug-ins/`. Then **restart Gimp**.
+Copy all PY files from :file:`src/` into :file:`cardassembler/` in your Gimp
+plug-in folder: :file:`{user}/AppData/Roaming/GIMP/{version}/plug-ins/`.
+Then **restart Gimp**.
 
 
 How to use this plug in
