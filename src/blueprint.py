@@ -126,9 +126,10 @@ class Blueprint():
             to the starting node
         :type start_by: str
         :return: Layout of the chosen card
-        :rtype: dict
+        :rtype: list
         """
-        return self._step_in({}, start_by)
+        layers = self._step_in({}, start_by)
+        return [(name, layers[name]) for name in sorted(layers.keys())]
 
     def _step_in(self, layout, this_step):
         """ Browse data guided by the ``next`` tag.

@@ -129,8 +129,7 @@ class Toolbox():
     def create_image(self, card_ID):
         """Blueprint to image.
 
-        Layout consists of commands which are called alphabetically by
-        name.
+        Layout consists of layers which are called alphabetically.
 
         :param card_ID: Path to the starting node.
         :type card_ID: str
@@ -142,10 +141,7 @@ class Toolbox():
             raise RuntimeError('Blueprint must be initialized first!')
         print('Assembling "{}"'.format(card_ID))
 
-        layout = self.blueprint.generate_layout(card_ID)
-        for layer_name in sorted(layout.keys()):
-            layer = layout[layer_name]
-
+        for layer_name, layer in self.blueprint.generate_layout(card_ID):
             LAYER_TYPE = 'layer_type'
             if LAYER_TYPE not in layer:
                 raise KeyError('Layer "{}" is missing {} tag.'.format(
