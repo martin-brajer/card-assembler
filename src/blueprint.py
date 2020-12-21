@@ -4,9 +4,6 @@ Supplemental script which handles data manipulation.
 
 Read an XML file and produce a layout list, which is then used
 by the main script :mod:`cardassembler`.
-
-.. note::
-    Run this script directly to run a :mod:`unittest`.
 """
 
 
@@ -15,12 +12,13 @@ __version__ = '1.5.0'
 __author__ = 'Martin Brajer'
 
 
-import unittest
-
 import xml.etree.ElementTree as ET
 
 
-def main(path):
+def main():
+    path = ''
+    if not path:
+        return
     blueprint = Blueprint((path + '\\Blueprint.xml').decode('utf-8'))
     layout = blueprint.generate_layout('unique item example')
     palette = blueprint.generate_palette('color')
@@ -37,7 +35,7 @@ class Blueprint():
     """
 
     #: Those tags are always stored in a :class:`list` & have extra treatment
-    # in :meth:`_step_in`.
+    #: in :meth:`_step_in`.
     SPECIAL_TAGS = ['next', 'text']
 
     def __init__(self, file_path):
@@ -231,79 +229,5 @@ class Blueprint():
         return palette
 
 
-class TestCodeFormat(unittest.TestCase):
-
-    def test_conformance(self):
-        """Test that we conform to PEP-8."""
-        import pycodestyle
-        style = pycodestyle.StyleGuide()  # (quiet=True)
-        result = style.check_files([
-            'src\\blueprint.py',
-            'src\\cardassembler.py'
-            ])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
-
-    def test_version(self):
-        """ Test whether :data:`__version__` follows
-        `Semantic Versioning 2.0.0 <https://semver.org/>`_.
-        """
-        import re
-        #: FAQ: Is there a suggested regular expression (RegEx) to
-        # check a SemVer string?
-        pattern = (
-            r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0'
-            r'|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-'
-            r'9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*'
-            r'))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)'
-            r'*))?$'
-            )
-        self.assertTrue(re.search(pattern, __version__))
-
-
-class TestBlueprintMethods(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-
-        cls.blueprint = Blueprint(None)
-        #: Beginning of example :file:`Minimal blueprint.xml`.
-        XML = (
-            '<data><card><command01_image><layer_type>image</layer_type>'
-            '<size parse="tuple">800, 500</size></command01_image>'
-            '</card></data>'
-            )
-        cls.element_tree = ET.fromstring(XML)
-        #: Dict representation of :data:`XML`.
-        cls.DICT = {'card': {'command01_image': {'layer_type': 'image',
-                    'size': (800, 500)}}}
-
-    def test_parse_int(self):
-        self.assertEqual(self.blueprint._parse('5', 'int'), 5)
-
-    def test_parse_float(self):
-        self.assertAlmostEqual(self.blueprint._parse('1.3', 'float'), 1.3)
-
-    def test_parse_tuple_spaces(self):
-        self.assertEqual(
-            self.blueprint._parse('3, 5', 'tuple'),
-            self.blueprint._parse('3,5', 'tuple'))
-
-    def test_parse_unknown(self):
-        with self.assertRaises(ValueError):
-            self.blueprint._parse('test', 'foo')
-
-    def test_ElementTree_to_dict(self):
-        self.assertEqual(self.blueprint._ElementTree_to_dict(
-            self.element_tree), self.DICT)
-
-    def test_goto(self):
-        self.blueprint.data = self.DICT
-        self.assertEqual(
-            self.blueprint._goto('card command01_image'),
-            self.DICT['card']['command01_image'])
-
-
 if __name__ == '__main__':
-    unittest.main(exit=False)
-    # main('')
+    main()
