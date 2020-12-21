@@ -14,7 +14,7 @@ its installation folder and direct import from different folder raises
 """
 
 
-__all__ = []
+__all__ = ['Toolbox']
 # Needs :class:`blueprint`. See below.
 __version__ = None
 __author__ = None
@@ -124,7 +124,7 @@ class Toolbox():
             'select': self._layer_select,
             'mask': self._layer_mask,
             'hide': self._layer_hide,
-            }
+        }
 
     def create_image(self, card_ID):
         """Blueprint to image.
@@ -449,11 +449,11 @@ gimpfu.register(
         (gimpfu.PF_STRING, 'xmlFile', 'XML file:', 'Blueprint.xml'),
         (gimpfu.PF_TEXT, 'paletteID', 'Palette ID:', 'color'),
         (gimpfu.PF_TEXT, 'name', 'Name:', 'Card Assembler Palette'),
-        ],
+    ],
     results=[],
     function=palette_creator,
     menu='<Image>/Card Assembler'
-    )
+)
 
 gimpfu.register(
     proc_name='CA_card_assembler',  # Used in Procedure browser.
@@ -470,10 +470,10 @@ gimpfu.register(
         (gimpfu.PF_STRING, 'xmlFile', 'XML file:', 'Blueprint.xml'),
         (gimpfu.PF_TEXT, 'cardIDs', 'Card IDs:', ''),
         (gimpfu.PF_BOOL, 'save', 'Save:', False),
-        ],
+    ],
     results=[],
     function=card_creator,
     menu='<Image>/Card Assembler'
-    )
+)
 
 gimpfu.main()
