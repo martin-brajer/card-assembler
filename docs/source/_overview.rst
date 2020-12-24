@@ -1,12 +1,14 @@
 .. Referenced in ``index.rst`` and ``cardAssemblerOverview`` with
    different titles following its roles.
 
-|Last release| |License| |Documentation Status|
+|Last release| |License| |Unittest| |Documentation Status|
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/card-assembler/badge/?version=latest
    :target: https://card-assembler.readthedocs.io/en/latest/?badge=latest
 .. |License| image:: https://img.shields.io/github/license/martin-brajer/card-assembler
    :target: https://github.com/martin-brajer/card-assembler/blob/master/LICENSE
+.. |Unittest| image:: https://github.com/martin-brajer/card-assembler/workflows/Python%20unittest/badge.svg
+   :target: https://github.com/martin-brajer/card-assembler/actions
 .. |Last release| image:: https://img.shields.io/github/v/release/martin-brajer/card-assembler
    :target: https://github.com/martin-brajer/card-assembler/releases
 
