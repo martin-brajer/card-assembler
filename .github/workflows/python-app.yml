@@ -26,4 +26,5 @@ jobs:
         pip install -r docs/requirements.txt
     - name: Test with unittest
       run: |
-        python -m unittest src/test_card_assembler
+        cd src
+        python -m unittest test_card_assembler
