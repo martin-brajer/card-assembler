@@ -22,11 +22,16 @@ class TestCodeFormat(unittest.TestCase):
 
     def test_conformance(self):
         """ Test that we conform to PEP-8. """
+        import os
         import pycodestyle
+
         style = pycodestyle.StyleGuide()  # (quiet=True)
+        path = os.path.abspath(os.path.dirname(__file__))
         result = style.check_files([
-            r'src\blueprint.py',
-            r'src\cardassembler.py',
+            path + r'\blueprint.py',
+            path + r'\cardassembler.py',
+            # r'src\blueprint.py',
+            # r'src\cardassembler.py',
         ])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
