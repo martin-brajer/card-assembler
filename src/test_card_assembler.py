@@ -25,8 +25,8 @@ class TestCodeFormat(unittest.TestCase):
         import pycodestyle
         style = pycodestyle.StyleGuide()  # (quiet=True)
         result = style.check_files([
-            'src\\blueprint.py',
-            'src\\cardassembler.py'
+            r'src\blueprint.py',
+            r'src\cardassembler.py',
         ])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
