@@ -7,7 +7,7 @@ alphabetically called to formulate respective layer builders.
 
 .. warning::
    Each layer must include ``layer_type`` tag! Accepted values are listed in
-   section :doc:`layerTypes`.
+   section :doc:`layer_types`.
 
 .. note::
    Term *"layer"* is used a bit vaguely here. Among real layers

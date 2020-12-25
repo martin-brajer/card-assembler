@@ -1,4 +1,4 @@
-.. Referenced in ``index.rst`` and ``cardAssemblerOverview`` with
+.. Referenced in ``index.rst`` and ``card_assembler_overview`` with
    different titles following its roles.
 
 |Last release| |License| |Unittest| |Documentation Status|

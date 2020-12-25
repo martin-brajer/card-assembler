@@ -12,9 +12,9 @@ Welcome to Card Assembler's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   cardAssemblerOverview
-   creatingBlueprint
-   layerTypes
+   card_assembler_overview
+   creating_blueprint
+   layer_types
    modules/modules
 
 
