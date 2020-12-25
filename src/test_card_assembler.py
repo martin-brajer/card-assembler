@@ -7,13 +7,18 @@ Testing of both scripts: :mod:`cardassembler` and :mod:`blueprint`.
 """
 
 
+import os
+import re
 import sys
 import unittest
 
 import xml.etree.ElementTree as ET
+import pycodestyle
 
 import blueprint
-from MyMock import Gimpfu as Mock_Gimpfu  # Bypass internal Gimp's python.
+# Bypass internal Gimp's python gimpfu package imported
+# by :mod:`cardassembler`.
+from MyMock import Gimpfu as Mock_Gimpfu
 sys.modules['gimpfu'] = Mock_Gimpfu()
 import cardassembler  # nopep8
 
@@ -22,16 +27,11 @@ class TestCodeFormat(unittest.TestCase):
 
     def test_conformance(self):
         """ Test that we conform to PEP-8. """
-        import os
-        import pycodestyle
-
-        style = pycodestyle.StyleGuide()  # (quiet=True)
+        style = pycodestyle.StyleGuide()
         path = os.path.abspath(os.path.dirname(__file__))
         result = style.check_files([
-            path + r'\blueprint.py',
-            path + r'\cardassembler.py',
-            # r'src\blueprint.py',
-            # r'src\cardassembler.py',
+            path + '\\blueprint.py',
+            path + '\\cardassembler.py',
         ])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
@@ -40,7 +40,6 @@ class TestCodeFormat(unittest.TestCase):
         """ Test whether :data:`__version__` follows
         `Semantic Versioning 2.0.0 <https://semver.org/>`_.
         """
-        import re
         #: FAQ: Is there a suggested regular expression (RegEx) to
         # check a SemVer string?
         pattern = (
