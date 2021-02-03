@@ -1,6 +1,7 @@
 # My files.
 TODO.txt
 docs/index.html.lnk
+*.lnk
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

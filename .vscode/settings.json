@@ -30,7 +30,6 @@
     "restructuredtext.sphinxBuildPath": "C:\\Python\\Scripts\\sphinx-build.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\docs\\source",
     "restructuredtext.builtDocumentationPath": "${workspaceFolder}\\docs\\build\\html",
-    "restructuredtext.languageServer.disabled": false,
     "python.linting.pycodestyleEnabled": true,
     "python.linting.enabled": true,
 }
