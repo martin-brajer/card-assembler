@@ -5,4 +5,5 @@ Library
    :maxdepth: 4
 
    cardassembler
+   toolbox
    blueprint
