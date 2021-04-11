@@ -8,7 +8,7 @@ by the main script :mod:`cardassembler`.
 
 
 __all__ = ['Blueprint']
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 __author__ = 'Martin Brajer'
 
 

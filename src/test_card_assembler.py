@@ -18,9 +18,10 @@ import pycodestyle
 import blueprint
 # Bypass internal Gimp's python gimpfu package imported
 # by :mod:`cardassembler`.
-from MyMock import Gimpfu as Mock_Gimpfu
+from my_mock import Gimpfu as Mock_Gimpfu
 sys.modules['gimpfu'] = Mock_Gimpfu()
 import cardassembler  # nopep8
+import toolbox  # nopep8
 
 
 class TestCodeFormat(unittest.TestCase):
@@ -32,6 +33,7 @@ class TestCodeFormat(unittest.TestCase):
         result = style.check_files([
             path + '\\blueprint.py',
             path + '\\cardassembler.py',
+            path + '\\toolbox.py',
         ])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
@@ -53,9 +55,11 @@ class TestCodeFormat(unittest.TestCase):
 
     def test_version_equal(self):
         self.assertEqual(cardassembler.__version__, blueprint.__version__)
+        self.assertEqual(toolbox.__version__, blueprint.__version__)
 
     def test_author_equal(self):
         self.assertEqual(cardassembler.__author__, blueprint.__author__)
+        self.assertEqual(toolbox.__author__, blueprint.__author__)
 
 
 class TestBlueprintMethods(unittest.TestCase):
