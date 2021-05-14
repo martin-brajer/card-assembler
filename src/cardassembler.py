@@ -58,14 +58,14 @@ def card_creator(data_folder, xml_file, card_IDs, save):
     data_folder = data_folder.decode('utf-8')
     keep_cmd_open = False
 
-    toolbox = toolbox.Toolbox(data_folder, xml_file)
+    toolbox_ = toolbox.Toolbox(data_folder, xml_file)
     for card_ID in card_IDs.split('\n'):
         if card_ID == 'keepCmdOpen':
             keep_cmd_open = True
             continue
-        toolbox.create_image(card_ID)
+        toolbox_.create_image(card_ID)
         if save:
-            toolbox.save_image()
+            toolbox_.save_image()
 
     if keep_cmd_open:
         raw_input('\nPress Enter to close this window!')
@@ -91,8 +91,8 @@ def palette_creator(data_folder, xml_file, palette_ID, name):
         raise ValueError('No palette ID inserted!')
     data_folder = data_folder.decode('utf-8')
 
-    toolbox = toolbox.Toolbox(data_folder, xml_file)
-    toolbox.create_palette(palette_ID, name)
+    toolbox_ = toolbox.Toolbox(data_folder, xml_file)
+    toolbox_.create_palette(palette_ID, name)
 
 
 gimpfu.register(
